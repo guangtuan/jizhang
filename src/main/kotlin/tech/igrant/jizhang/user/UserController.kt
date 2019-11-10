@@ -1,17 +1,23 @@
 package tech.igrant.jizhang.user
 
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
-@RequestMapping("/api/user")
 @RestController
+@RequestMapping("/api/user")
 class UserController(private val userRepo: UserRepo) {
 
     @GetMapping("/{user}")
-    fun user(@PathVariable("user") account: String): User? {
-        return userRepo.findByAccount(account);
+    fun user(@PathVariable("user") account: String): UserTo? {
+        val user = userRepo.findByAccount(account)
+        user?.let {
+            return UserTo.fromUser(user)
+        }
+        return null
+    }
+
+    @PostMapping
+    fun users(): List<UserTo?> {
+        return userRepo.findAll().toList().map { UserTo.fromUser(it) }
     }
 
 }
