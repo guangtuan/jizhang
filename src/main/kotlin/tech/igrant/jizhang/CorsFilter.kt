@@ -16,12 +16,11 @@ class CorsFilter : Filter {
     override fun doFilter(request: ServletRequest?, response: ServletResponse?, chain: FilterChain?) {
         val req: HttpServletRequest = request as HttpServletRequest
         val resp: HttpServletResponse = response as HttpServletResponse
+        setHeader(resp)
         if (Objects.equals(req.method, RequestMethod.OPTIONS.toString())) {
-            setHeader(resp)
             resp.status = 200;
             return;
         }
-        setHeader(resp)
         chain?.doFilter(req, resp)
     }
 
