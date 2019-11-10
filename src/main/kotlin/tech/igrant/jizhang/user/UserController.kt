@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/user")
 class UserController(private val userRepo: UserRepo) {
 
-    @PostMapping("/query/{user}")
+    @PostMapping("/{user}")
     fun user(@PathVariable("user") account: String): UserTo? {
         val user = userRepo.findByAccount(account)
         user?.let {
@@ -15,7 +15,7 @@ class UserController(private val userRepo: UserRepo) {
         return null
     }
 
-    @PostMapping("/query")
+    @GetMapping()
     fun users(): List<UserTo?> {
         return userRepo.findAll().toList().map { UserTo.display(it) }
     }
