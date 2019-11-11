@@ -6,7 +6,7 @@ import org.springframework.boot.web.servlet.ServletComponentScan
 import org.springframework.context.annotation.ComponentScan
 
 @SpringBootApplication
-@ComponentScan("tech.igrant.jizhang")
+@ComponentScan("tech.igrant")
 @ServletComponentScan
 class JizhangApplication
 
