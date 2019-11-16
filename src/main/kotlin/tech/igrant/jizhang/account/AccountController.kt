@@ -17,8 +17,8 @@ class AccountController(
 
     @PostMapping()
     fun create(@RequestBody account: Account): AccountVo {
-        accountRepo.save(account)
         val userObject = userRepo.findById(account.userId).get()
+        accountRepo.save(account)
         return AccountVo.fromAccount(account, userObject.username)
     }
 

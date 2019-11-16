@@ -22,18 +22,18 @@ class DetailController(
 
     @PostMapping
     fun create(@RequestBody detail: Detail): DetailVo {
-        detail.createdAt = Date()
-        detailRepo.save(detail)
         val user = userRepo.findById(detail.userId).get()
         val subject = subjectRepo.findById(detail.subjectId).get()
         val accountNameMap = accountRepo.findAllById(
                 listOf(detail.sourceAccountId, detail.destAccountId)
         ).associateBy({ a -> a.id }, { a -> a.name })
+        detail.createdAt = Date()
+        detailRepo.save(detail)
         return DetailVo.fromPo(
                 detail,
                 username = user.username,
-                sourceAccountName = accountNameMap.get(detail.sourceAccountId).orEmpty(),
-                destAccountName = accountNameMap.get(detail.destAccountId).orEmpty(),
+                sourceAccountName = accountNameMap[detail.sourceAccountId].orEmpty(),
+                destAccountName = accountNameMap[detail.destAccountId].orEmpty(),
                 subjectName = subject.name
         )
     }
