@@ -27,7 +27,7 @@ class CorsFilter : Filter {
     private fun setHeader(resp: HttpServletResponse) {
         resp.addHeader("Access-Control-Allow-Origin", "*");
         resp.addHeader("Access-Control-Allow-Credentials", "true");
-        resp.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+        resp.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
         resp.addHeader("Access-Control-Max-Age", "1800");
         resp.addHeader("Access-Control-Allow-Headers", "content-type, Origin, token");
     }

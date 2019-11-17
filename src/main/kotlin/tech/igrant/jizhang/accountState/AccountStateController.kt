@@ -1,5 +1,7 @@
 package tech.igrant.jizhang.accountState
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.*
 import tech.igrant.jizhang.account.AccountRepo
 
@@ -11,8 +13,9 @@ class AccountStateController(
 ) {
 
     @GetMapping
-    fun list(): List<AccountStateVo> {
-        return accountStateRepo.listVo().toList()
+    @ResponseBody
+    fun list(pageable: Pageable): Page<AccountStateVo> {
+        return accountStateRepo.listVo(pageable = pageable)
     }
 
     @PostMapping
