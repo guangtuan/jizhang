@@ -1,5 +1,7 @@
 package tech.igrant.jizhang.detail
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 
@@ -19,7 +21,8 @@ interface DetailRepo : CrudRepository<Detail, Long> {
             "left join User u " +
             "on d.userId = u.id " +
             "left join Subject sub " +
-            "on d.subjectId = sub.id")
-    fun listVo(): List<DetailVo>
+            "on d.subjectId = sub.id " +
+            "order by created_at desc")
+    fun listVo(pageable: Pageable): Page<DetailVo>
 
 }

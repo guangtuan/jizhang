@@ -1,5 +1,7 @@
 package tech.igrant.jizhang.detail
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.*
 import tech.igrant.jizhang.account.AccountRepo
 import tech.igrant.jizhang.subject.SubjectRepo
@@ -16,8 +18,13 @@ class DetailController(
 ) {
 
     @GetMapping
-    fun list(): List<DetailVo> {
-        return detailRepo.listVo().toList()
+    fun list(pageable: Pageable): Page<DetailVo> {
+        return detailRepo.listVo(pageable = pageable)
+    }
+
+    @DeleteMapping("/{id}")
+    fun delete(@PathVariable("id") id: Long) {
+        return detailRepo.deleteById(id)
     }
 
     @PostMapping
@@ -27,7 +34,6 @@ class DetailController(
         val accountNameMap = accountRepo.findAllById(
                 listOf(detail.sourceAccountId, detail.destAccountId)
         ).associateBy({ a -> a.id }, { a -> a.name })
-        detail.createdAt = Date()
         detailRepo.save(detail)
         return DetailVo.fromPo(
                 detail,
