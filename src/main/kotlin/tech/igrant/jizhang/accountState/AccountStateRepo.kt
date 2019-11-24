@@ -13,4 +13,6 @@ interface AccountStateRepo : PagingAndSortingRepository<AccountState, Long> {
             "on s.accountId = a.id")
     fun listVo(pageable: Pageable): Page<AccountStateVo>
 
+    fun findByAccountId(accountId: Long): List<AccountState>
+
 }

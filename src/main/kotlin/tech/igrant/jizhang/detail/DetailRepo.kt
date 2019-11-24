@@ -25,4 +25,7 @@ interface DetailRepo : CrudRepository<Detail, Long> {
             "order by created_at desc")
     fun listVo(pageable: Pageable): Page<DetailVo>
 
+    fun findBySourceAccountId(accountId: Long): List<Detail>
+    fun findByDestAccountId(accountId: Long): List<Detail>
+
 }
