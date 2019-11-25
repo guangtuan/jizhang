@@ -1,5 +1,7 @@
 package tech.igrant.jizhang.subject
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -7,8 +9,8 @@ import org.springframework.web.bind.annotation.*
 class SubjectController(private val subjectRepo: SubjectRepo) {
 
     @GetMapping()
-    fun list(): List<Subject> {
-        return subjectRepo.findAll().toList()
+    fun list(pageable: Pageable): Page<Subject> {
+        return subjectRepo.findAll(pageable)
     }
 
     @PostMapping
