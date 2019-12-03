@@ -4,6 +4,8 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
+import org.springframework.data.repository.query.Param
+import java.util.*
 
 interface DetailRepo : CrudRepository<Detail, Long> {
 
@@ -28,4 +30,10 @@ interface DetailRepo : CrudRepository<Detail, Long> {
     fun findBySourceAccountId(accountId: Long): List<Detail>
     fun findByDestAccountId(accountId: Long): List<Detail>
 
+    @Query(value = "select new tech.igrant.jizhang.detail.StatDetail (d.subjectId, sub.name as subjectName, (sum(d.amount)/100) as total) " +
+            "from Detail d left join Subject sub on d.subjectId = sub.id " +
+            "where d.destAccountId = -1 and " +
+            "d.createdAt between :start and :end " +
+            "group by d.subjectId order by total")
+    fun query(@Param("start") start: Date, @Param("end") end: Date): List<StatDetail>
 }
