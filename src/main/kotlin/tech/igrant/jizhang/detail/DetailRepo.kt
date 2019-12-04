@@ -32,8 +32,14 @@ interface DetailRepo : CrudRepository<Detail, Long> {
 
     @Query(value = "select new tech.igrant.jizhang.detail.StatDetail (d.subjectId, sub.name as subjectName, (sum(d.amount)/100) as total) " +
             "from Detail d left join Subject sub on d.subjectId = sub.id " +
-            "where d.destAccountId = -1 and " +
-            "d.createdAt between :start and :end " +
-            "group by d.subjectId order by total")
-    fun query(@Param("start") start: Date, @Param("end") end: Date): List<StatDetail>
+            "where d.destAccountId = -1 " +
+            "and d.createdAt between :start and :end " +
+            "and d.subjectId in (:subjectIds) " +
+            "group by d.subjectId " +
+            "order by total")
+    fun query(
+            @Param("start") start: Date,
+            @Param("end") end: Date,
+            @Param("subjectIds") subjectIds: List<Long>
+    ): List<StatDetail>
 }
