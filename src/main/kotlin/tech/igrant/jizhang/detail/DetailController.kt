@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*
 import tech.igrant.jizhang.account.AccountRepo
 import tech.igrant.jizhang.subject.SubjectRepo
 import tech.igrant.jizhang.user.UserRepo
-import java.util.*
 
 @RestController
 @RequestMapping("/api/details")
