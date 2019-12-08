@@ -19,7 +19,8 @@ configurations {
 }
 
 repositories {
-	mavenCentral()
+    maven(url = "https://maven.aliyun.com/repository/public/")
+    mavenCentral()
 }
 
 dependencies {
@@ -31,7 +32,8 @@ dependencies {
 	implementation("mysql:mysql-connector-java")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    implementation("org.apache.commons:commons-lang3")
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test") {
 		exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
