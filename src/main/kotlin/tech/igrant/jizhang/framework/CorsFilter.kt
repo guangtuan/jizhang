@@ -1,4 +1,4 @@
-package tech.igrant.jizhang
+package tech.igrant.jizhang.framework
 
 import org.springframework.web.bind.annotation.RequestMethod
 import java.util.*
