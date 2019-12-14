@@ -1,4 +1,4 @@
-package tech.igrant.jizhang.config
+package tech.igrant.jizhang.framework
 
 import com.alibaba.druid.pool.DruidDataSource
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer
