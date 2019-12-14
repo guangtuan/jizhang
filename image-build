@@ -1,0 +1,5 @@
+#!/bin/bash
+image=jizhang
+container=jizhang
+
+docker build . -t ${image}

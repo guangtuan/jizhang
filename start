@@ -1,0 +1,9 @@
+#!/bin/bash
+image=jizhang
+container=jizhang
+
+docker stop $container && docker rm $container
+
+docker run --name $container \
+  -p 44444:44444 \
+  -d $image
