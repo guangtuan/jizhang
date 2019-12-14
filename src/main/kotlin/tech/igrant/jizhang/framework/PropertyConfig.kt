@@ -21,7 +21,6 @@ class PropertyConfig {
             val dbName = System.getenv("JIZHANG_DB_NAME")
             val dbUser = System.getenv("JIZHANG_DB_USER")
             val dbPassword = System.getenv("JIZHANG_DB_PASSWORD")
-            val redisUrl = System.getenv("JIZHANG_REDIS_URL")
             dataSource.url = dataSourceUrl(dbHost, dbName)
             dataSource.username = dbUser
             dataSource.password = dbPassword
@@ -35,13 +34,11 @@ class PropertyConfig {
             val dbName = System.getenv("JIZHANG_DB_NAME")
             val dbUser = System.getenv("JIZHANG_DB_USER")
             val dbPassword = System.getenv("JIZHANG_DB_PASSWORD")
-            val redisUrl = System.getenv("JIZHANG_REDIS_URL")
             val properties = Properties()
             properties["spring.datasource.url"] = dataSourceUrl(dbHost, dbName)
             properties["spring.datasource.dbname"] = dbName
             properties["spring.datasource.username"] = dbUser
             properties["spring.datasource.password"] = dbPassword
-            properties["spring.redis.host"] = redisUrl
             placeholderConfigurerSupport.setProperties(properties)
             val appProperties = ClassPathResource("application.properties")
             val druidProperties = ClassPathResource("druid.properties")
