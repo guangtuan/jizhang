@@ -1,0 +1,50 @@
+#!/bin/bash
+image=jizhang
+container=jizhang
+
+if [ -z "$JIZHANG_PORT" ]
+then
+    echo "please set env vir: JIZHANG_PORT"
+    exit 1
+fi
+
+if [ -z "JIZHANG_DB_HOST" ]
+then
+    echo "please set env vir: JIZHANG_DB_HOST"
+    exit 1
+fi
+
+if [ -z "JIZHANG_DB_NAME" ]
+then
+    echo "please set env vir: JIZHANG_DB_NAME"
+    exit 1
+fi
+
+if [ -z "JIZHANG_DB_USER" ]
+then
+    echo "please set env vir: JIZHANG_DB_USER"
+    exit 1
+fi
+
+if [ -z "JIZHANG_DB_PASSWORD" ]
+then
+    echo "please set env vir: JIZHANG_DB_PASSWORD"
+    exit 1
+fi
+
+if [ -z "JIZHANG_REDIS_URL" ]
+then
+    echo "please set env vir: JIZHANG_REDIS_URL"
+    exit 1
+fi
+
+docker stop $container && docker rm $container
+
+docker run --name $container \
+  -p ${JIZHANG_PORT}:8080 \
+  -e JIZHANG_DB_HOST=${JIZHANG_DB_HOST} \
+  -e JIZHANG_DB_NAME=${JIZHANG_DB_NAME} \
+  -e JIZHANG_DB_USER=${JIZHANG_DB_USER} \
+  -e JIZHANG_DB_PASSWORD=${JIZHANG_DB_PASSWORD} \
+  -e JIZHANG_REDIS_URL=${JIZHANG_REDIS_URL} \
+  -d $image
