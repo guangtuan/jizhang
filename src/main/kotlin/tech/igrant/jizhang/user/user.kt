@@ -5,7 +5,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "user")
-class User(
+data class User(
         var account: String,
         var password: String,
         var salt: String,
