@@ -1,5 +1,6 @@
 package tech.igrant.jizhang.user
 
+import io.swagger.annotations.ApiOperation
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -15,11 +16,13 @@ class UserController(private val userRepo: UserRepo) {
         return null
     }
 
+    @ApiOperation("列出所有的用户")
     @GetMapping()
     fun users(): List<UserTo?> {
         return userRepo.findAll().toList().map { UserTo.display(it) }
     }
 
+    @ApiOperation("新建一个用户")
     @PostMapping()
     fun createUser(@RequestBody userTo: UserTo): UserTo {
         val userToSave = UserTo.dbFormat(userTo)
