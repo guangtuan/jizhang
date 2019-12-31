@@ -10,3 +10,7 @@ export JIZHANG_REDIS_URL=localhost:6379
 
 export JIZHANG_FE_PORT=3456
 ```
+
+access api doc
+
+`http://localhost:port/swagger-ui.html`
