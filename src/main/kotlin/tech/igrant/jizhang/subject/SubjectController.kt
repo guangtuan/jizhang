@@ -12,8 +12,8 @@ class SubjectController(private val subjectRepo: SubjectRepo) {
 
     @ApiOperation("分页列出科目")
     @GetMapping()
-    fun list(pageable: Pageable): Page<Subject> {
-        return subjectRepo.findAll(pageable)
+    fun list(): List<Subject> {
+        return subjectRepo.findAll().toList()
     }
 
     @ApiOperation("新建一个科目")
