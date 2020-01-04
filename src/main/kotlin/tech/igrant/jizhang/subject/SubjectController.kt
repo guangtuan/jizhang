@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*
 @ApiOperation("科目接口")
 class SubjectController(private val subjectRepo: SubjectRepo) {
 
-    @ApiOperation("分页列出科目")
+    @ApiOperation("列出科目")
     @GetMapping()
     fun list(): List<Subject> {
         return subjectRepo.findAll().toList()
