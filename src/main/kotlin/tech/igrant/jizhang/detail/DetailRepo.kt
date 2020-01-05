@@ -30,7 +30,7 @@ interface DetailRepo : CrudRepository<Detail, Long> {
     fun findBySourceAccountId(accountId: Long): List<Detail>
     fun findByDestAccountId(accountId: Long): List<Detail>
 
-    @Query(value = "select new tech.igrant.jizhang.detail.StatDetail (d.subjectId, sub.name as subjectName, (sum(d.amount)/100) as total) " +
+    @Query(value = "select new tech.igrant.jizhang.detail.AmountTotal (d.subjectId, sub.name as subjectName, (sum(d.amount)/100) as total) " +
             "from Detail d left join Subject sub on d.subjectId = sub.id " +
             "where d.destAccountId = -1 " +
             "and d.createdAt between :start and :end " +
@@ -41,5 +41,5 @@ interface DetailRepo : CrudRepository<Detail, Long> {
             @Param("start") start: Date,
             @Param("end") end: Date,
             @Param("subjectIds") subjectIds: List<Long>
-    ): List<StatDetail>
+    ): List<AmountTotal>
 }

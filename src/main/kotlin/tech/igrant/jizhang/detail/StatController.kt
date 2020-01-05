@@ -11,11 +11,11 @@ import tech.igrant.jizhang.ext.getStartOfTomorrow
 class StatController(private val detailRepo: DetailRepo) {
 
     @PostMapping()
-    fun query(@RequestBody statQuery: StatQuery): List<StatDetail> {
+    fun query(@RequestBody amountTotalQuery: AmountTotalQuery): List<AmountTotal> {
         return detailRepo.query(
-                statQuery.start,
-                statQuery.end.getStartOfTomorrow(),
-                statQuery.subjects
+                amountTotalQuery.start,
+                amountTotalQuery.end.getStartOfTomorrow(),
+                amountTotalQuery.subjects
         )
     }
 
