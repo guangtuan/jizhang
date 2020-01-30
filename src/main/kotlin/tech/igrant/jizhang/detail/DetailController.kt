@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*
 import tech.igrant.jizhang.account.AccountRepo
 import tech.igrant.jizhang.subject.SubjectRepo
 import tech.igrant.jizhang.user.UserRepo
+import java.util.*
 
 @RestController
 @RequestMapping("/api/details")
@@ -67,6 +68,7 @@ class DetailController(
                     listOf(payload.sourceAccountId, payload.destAccountId)
             ).associateBy({ a -> a.id }, { a -> a.name })
             BeanUtils.copyProperties(payload, detailInDb)
+            detailInDb.updatedAt = Date()
             detailRepo.save(detailInDb)
             return ResponseEntity.ok(DetailVo.fromPo(
                     detailInDb,
