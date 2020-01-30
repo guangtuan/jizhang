@@ -1,6 +1,5 @@
 package tech.igrant.jizhang.detail
 
-import io.swagger.annotations.ApiModelProperty
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import org.springframework.beans.BeanUtils
