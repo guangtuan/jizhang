@@ -1,6 +1,8 @@
 package tech.igrant.jizhang.detail
 
+import io.swagger.annotations.ApiModelProperty
 import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
 import org.springframework.beans.BeanUtils
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -50,24 +52,27 @@ class DetailController(
     }
 
     @ApiOperation("更新一条明细")
-    @PutMapping
+    @PutMapping("/{id}")
     @ResponseBody
-    fun update(@RequestBody detail: DetailUpdateTo): ResponseEntity<DetailVo> {
-        val detailInDbOpt = detailRepo.findById(detail.id)
+    fun update(
+            @ApiParam("需要更新的明细的id") @PathVariable("id") id: Long,
+            @ApiParam("明细更新所传的对象") @RequestBody payload: DetailUpdateTo
+    ): ResponseEntity<DetailVo> {
+        val detailInDbOpt = detailRepo.findById(id)
         if (detailInDbOpt.isPresent) {
             val detailInDb = detailInDbOpt.get()
-            val user = userRepo.findById(detail.userId).get()
-            val subject = subjectRepo.findById(detail.subjectId).get()
+            val user = userRepo.findById(payload.userId).get()
+            val subject = subjectRepo.findById(payload.subjectId).get()
             val accountNameMap = accountRepo.findAllById(
-                    listOf(detail.sourceAccountId, detail.destAccountId)
+                    listOf(payload.sourceAccountId, payload.destAccountId)
             ).associateBy({ a -> a.id }, { a -> a.name })
-            BeanUtils.copyProperties(detail, detailInDb)
+            BeanUtils.copyProperties(payload, detailInDb)
             detailRepo.save(detailInDb)
             return ResponseEntity.ok(DetailVo.fromPo(
                     detailInDb,
                     username = user.username,
-                    sourceAccountName = accountNameMap[detail.sourceAccountId].orEmpty(),
-                    destAccountName = accountNameMap[detail.destAccountId].orEmpty(),
+                    sourceAccountName = accountNameMap[payload.sourceAccountId].orEmpty(),
+                    destAccountName = accountNameMap[payload.destAccountId].orEmpty(),
                     subjectName = subject.name
             ))
         } else {

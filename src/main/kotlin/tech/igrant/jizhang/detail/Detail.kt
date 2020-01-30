@@ -34,16 +34,23 @@ class DetailUpdateTo(
         @ApiModelProperty("备注")
         val remark: String? = null,
         @ApiModelProperty("金额，单位分")
-        val amount: Int? = null,
-        @ApiModelProperty("需要更新的明细id")
-        val id: Long
+        val amount: Int? = null
 )
 
+@ApiModel("明细供视图使用")
 data class DetailVo(
         var id: Long,
+        @ApiModelProperty("用户id")
+        val userId: Long,
         var username: String?,
+        @ApiModelProperty("来源账户id，如用支付宝吃饭，来源账户就是支付宝")
+        val sourceAccountId: Long? = null,
         var sourceAccountName: String?,
+        @ApiModelProperty("目标账户id，如发工资的时候，目标账户就是工资卡")
+        val destAccountId: Long? = null,
         var destAccountName: String?,
+        @ApiModelProperty("科目id")
+        val subjectId: Long,
         var subjectName: String?,
         var remark: String?,
         var createdAt: Date?,
@@ -67,7 +74,11 @@ data class DetailVo(
                     remark = po.remark,
                     createdAt = po.createdAt,
                     updatedAt = po.updatedAt,
-                    amount = po.amount
+                    amount = po.amount,
+                    subjectId = po.subjectId,
+                    destAccountId = po.destAccountId,
+                    sourceAccountId = po.sourceAccountId,
+                    userId = po.userId
             )
         }
     }
