@@ -19,4 +19,15 @@ internal class DetailServiceTest(
         ))
         listBySubject.forEach { i -> println(i.toJSON()) }
     }
+
+    @Test
+    fun listAll() {
+        val listBySubject = detailService.listBySubject(DetailQuery(
+                subjectIds = arrayListOf(),
+                page = 0,
+                size = 15
+        ))
+        listBySubject.forEach { i -> println(i.toJSON()) }
+    }
+
 }
