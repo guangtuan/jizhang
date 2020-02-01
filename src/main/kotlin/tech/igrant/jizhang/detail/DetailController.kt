@@ -4,10 +4,13 @@ import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import org.springframework.beans.BeanUtils
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import tech.igrant.jizhang.account.AccountRepo
+import tech.igrant.jizhang.framework.PageQuery
+import tech.igrant.jizhang.framework.PageResult
 import tech.igrant.jizhang.subject.SubjectRepo
 import tech.igrant.jizhang.user.UserRepo
 import java.util.*
@@ -25,7 +28,7 @@ class DetailController(
     @ApiOperation("查询明细")
     @PostMapping("query")
     @ResponseBody
-    fun listBySubject(@ApiParam("查询对象") @RequestBody detailQuery: DetailQuery): List<DetailVo> {
+    fun listBySubject(@ApiParam("查询对象") @RequestBody detailQuery: PageQuery<DetailQuery>): PageResult<DetailVo> {
         return detailService.listBySubject(detailQuery)
     }
 

@@ -2,6 +2,8 @@ package tech.igrant.jizhang.detail
 
 import org.springframework.stereotype.Service
 import tech.igrant.jizhang.account.AccountService
+import tech.igrant.jizhang.framework.PageQuery
+import tech.igrant.jizhang.framework.PageResult
 import tech.igrant.jizhang.subject.SubjectService
 import tech.igrant.jizhang.user.UserService
 import javax.persistence.EntityManager
@@ -16,22 +18,33 @@ class DetailService(
         private val userService: UserService
 ) {
 
-    fun listBySubject(detailQuery: DetailQuery): List<DetailVo> {
+    fun listBySubject(detailQuery: PageQuery<DetailQuery>): PageResult<DetailVo> {
         val criteriaBuilder = entityManager.criteriaBuilder
-        val criteriaQuery = criteriaBuilder.createQuery(Detail::class.java)
-        val root = criteriaQuery.from(Detail::class.java)
-        val subjectIdsFilter = subjectIdsFilter(criteriaBuilder, root, detailQuery)
-        val createdAtColumn = root.get<Any>("createdAt")
-        val sql = criteriaQuery
-                .select(root)
-                .orderBy(criteriaBuilder.asc(createdAtColumn))
-        subjectIdsFilter?.let { sql.where(it) }
-        return entityManager.createQuery(sql)
+        val rowsQuery = criteriaBuilder.createQuery(Detail::class.java)
+        val countQuery = criteriaBuilder.createQuery(Long::class.java)
+        val data = rowsQuery.from(Detail::class.java)
+        val count = countQuery.from(Detail::class.java)
+        val subjectIdsFilter = subjectIdsFilter(criteriaBuilder, data, detailQuery.queryParam)
+        val createdAtColumn = data.get<Any>("createdAt")
+        val dataSql = rowsQuery.select(data).orderBy(criteriaBuilder.asc(createdAtColumn))
+        val countSql = countQuery.select(criteriaBuilder.count(count))
+        subjectIdsFilter?.let {
+            dataSql.where(it);
+            countSql.where(it)
+        }
+        val dataQueryExe = entityManager.createQuery(dataSql)
+        val countQueryExe = entityManager.createQuery(countSql)
+        val resultList = dataQueryExe
                 .setFirstResult(detailQuery.page * detailQuery.size)
                 .setMaxResults((detailQuery.page + 1) * detailQuery.size)
                 .resultList
-                .map(this::toVo)
-                .toList()
+        val total = countQueryExe.singleResult
+        return PageResult(
+                content = resultList.map(this::toVo).toList(),
+                total = total,
+                page = detailQuery.page,
+                size = detailQuery.size
+        )
     }
 
     private fun subjectIdsFilter(criteriaBuilder: CriteriaBuilder, root: Root<Detail>, detailQuery: DetailQuery): CriteriaBuilder.In<Any>? {
