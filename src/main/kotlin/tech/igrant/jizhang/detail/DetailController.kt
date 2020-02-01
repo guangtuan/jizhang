@@ -18,8 +18,16 @@ class DetailController(
         private val userRepo: UserRepo,
         private val subjectRepo: SubjectRepo,
         private val accountRepo: AccountRepo,
-        private val detailRepo: DetailRepo
+        private val detailRepo: DetailRepo,
+        private val detailService: DetailService
 ) {
+
+    @ApiOperation("查询明细")
+    @PostMapping("query")
+    @ResponseBody
+    fun listBySubject(@ApiParam("查询对象") @RequestBody detailQuery: DetailQuery): List<DetailVo> {
+        return detailService.listBySubject(detailQuery)
+    }
 
     @ApiOperation("分页列出明细")
     @GetMapping
