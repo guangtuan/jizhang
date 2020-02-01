@@ -26,19 +26,18 @@ class DetailService(
         val count = countQuery.from(Detail::class.java)
         val subjectIdsFilter = subjectIdsFilter(criteriaBuilder, data, detailQuery.queryParam)
         val createdAtColumn = data.get<Any>("createdAt")
-        val dataSql = rowsQuery.select(data).orderBy(criteriaBuilder.asc(createdAtColumn))
+        val dataSql = rowsQuery.select(data).orderBy(criteriaBuilder.desc(createdAtColumn))
         val countSql = countQuery.select(criteriaBuilder.count(count))
         subjectIdsFilter?.let {
             dataSql.where(it);
             countSql.where(it)
         }
-        val dataQueryExe = entityManager.createQuery(dataSql)
-        val countQueryExe = entityManager.createQuery(countSql)
-        val resultList = dataQueryExe
-                .setFirstResult(detailQuery.page * detailQuery.size)
-                .setMaxResults((detailQuery.page + 1) * detailQuery.size)
+        val startIndex = detailQuery.page * detailQuery.size
+        val resultList = entityManager.createQuery(dataSql)
+                .setFirstResult(startIndex)
+                .setMaxResults(detailQuery.size)
                 .resultList
-        val total = countQueryExe.singleResult
+        val total = entityManager.createQuery(countSql).singleResult
         return PageResult(
                 content = resultList.map(this::toVo).toList(),
                 total = total,

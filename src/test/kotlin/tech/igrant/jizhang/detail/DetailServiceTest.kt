@@ -18,14 +18,18 @@ internal class DetailServiceTest(
                 page = 0,
                 size = 15
         )
-        var firstResult = detailService.listBySubject(query)
-        val standardTotal = firstResult.total
-        while (firstResult.hasNext()) {
+        var result = detailService.listBySubject(query)
+        val standardTotal = result.total
+        while (result.hasNext()) {
             query = query.next()
-            firstResult = detailService.listBySubject(query)
+            result = detailService.listBySubject(query)
+            Assert.assertEquals(
+                    Math.min(query.size, result.content.size),
+                    result.content.size
+            )
             Assert.assertEquals(
                     standardTotal,
-                    firstResult.total
+                    result.total
             )
         }
     }
