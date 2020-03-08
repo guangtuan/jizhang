@@ -5,14 +5,31 @@ import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
+import org.springframework.data.redis.connection.RedisPassword
 import java.util.*
 import javax.sql.DataSource
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
+
+
 
 
 @Configuration
 class PropertyConfig {
 
     companion object {
+
+        @Bean
+        fun redisConnectionFactory(): LettuceConnectionFactory {
+            val redisHost = System.getenv("JIZHANG_CACHE_HOST")
+            val redisPort = System.getenv("JIZHANG_CACHE_PORT").toInt()
+            val redisPass = System.getenv("JIZHANG_CACHE_PASS")
+            val redisDb = System.getenv("JIZHANG_CACHE_DB")?.toInt()
+            val redisStandaloneConfiguration = RedisStandaloneConfiguration(redisHost, redisPort)
+            redisStandaloneConfiguration.password = RedisPassword.of(redisPass)
+            redisStandaloneConfiguration.database = redisDb ?: 0
+            return LettuceConnectionFactory(redisStandaloneConfiguration)
+        }
 
         @Bean
         fun dataSource(): DataSource {
