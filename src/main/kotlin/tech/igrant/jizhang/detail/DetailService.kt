@@ -2,12 +2,16 @@ package tech.igrant.jizhang.detail
 
 import org.springframework.stereotype.Service
 import tech.igrant.jizhang.account.AccountService
+import tech.igrant.jizhang.ext.toJSON
 import tech.igrant.jizhang.framework.PageQuery
 import tech.igrant.jizhang.framework.PageResult
 import tech.igrant.jizhang.subject.SubjectService
 import tech.igrant.jizhang.user.UserService
+import java.util.*
+import java.util.logging.Logger
 import javax.persistence.EntityManager
 import javax.persistence.criteria.CriteriaBuilder
+import javax.persistence.criteria.Predicate
 import javax.persistence.criteria.Root
 
 @Service
@@ -18,19 +22,22 @@ class DetailService(
         private val userService: UserService
 ) {
 
-    fun listBySubject(detailQuery: PageQuery<DetailQuery>): PageResult<DetailVo> {
+    val logger: Logger = Logger.getLogger(DetailService::class.simpleName)
+
+    fun query(detailQuery: PageQuery<DetailQuery>): PageResult<DetailVo> {
+        logger.info { "params: ${detailQuery.toJSON()}" }
         val criteriaBuilder = entityManager.criteriaBuilder
         val rowsQuery = criteriaBuilder.createQuery(Detail::class.java)
         val countQuery = criteriaBuilder.createQuery(Long::class.java)
         val data = rowsQuery.from(Detail::class.java)
         val count = countQuery.from(Detail::class.java)
-        val subjectIdsFilter = subjectIdsFilter(criteriaBuilder, data, detailQuery.queryParam)
         val createdAtColumn = data.get<Any>("createdAt")
         val dataSql = rowsQuery.select(data).orderBy(criteriaBuilder.desc(createdAtColumn))
         val countSql = countQuery.select(criteriaBuilder.count(count))
-        subjectIdsFilter?.let {
-            dataSql.where(it);
-            countSql.where(it)
+        if (DetailQuery.meaningful(detailQuery.queryParam)) {
+            val condition = conditions(criteriaBuilder, detailQuery, data)
+            dataSql.where(condition)
+            countSql.where(condition)
         }
         val startIndex = detailQuery.page * detailQuery.size
         val resultList = entityManager.createQuery(dataSql)
@@ -46,14 +53,33 @@ class DetailService(
         )
     }
 
-    private fun subjectIdsFilter(criteriaBuilder: CriteriaBuilder, root: Root<Detail>, detailQuery: DetailQuery): CriteriaBuilder.In<Any>? {
-        if (detailQuery.subjectIds.isEmpty()) {
-            return null
+    private fun conditions(builder: CriteriaBuilder, detailQuery: PageQuery<DetailQuery>, data: Root<Detail>): Predicate {
+        val conditions = mutableListOf<Predicate>()
+        detailQuery.queryParam.subjectIds?.let {
+            if (it.isNotEmpty()) {
+                val subjectIdRow = data.get<Long>("subjectId")
+                val inExpression = builder.`in`(subjectIdRow)
+                for (subjectId in it) {
+                    inExpression.value(subjectId)
+                }
+                conditions.add(inExpression)
+            }
         }
-        val subjectIdColumn = root.get<Any>("subjectId")
-        val inExpression = criteriaBuilder.`in`(subjectIdColumn)
-        detailQuery.subjectIds.forEach { i -> inExpression.value(i) }
-        return inExpression
+        detailQuery.queryParam.sourceAccountId?.let {
+            val sourceAccountIdRow = data.get<Long>("sourceAccountId")
+            conditions.add(builder.equal(sourceAccountIdRow, it))
+        }
+        detailQuery.queryParam.destAccountId?.let {
+            val destAccountIdRow = data.get<Long>("destAccountId")
+            conditions.add(builder.equal(destAccountIdRow, it))
+        }
+        detailQuery.queryParam.start?.let {
+            detailQuery.queryParam.end?.let {
+                val createdAtRow = data.get<Date>("createdAt")
+                conditions.add(builder.between(createdAtRow, detailQuery.queryParam.start, detailQuery.queryParam.end))
+            }
+        }
+        return conditions.reduce { acc, curr -> builder.and(acc, curr) }
     }
 
     fun toVo(detail: Detail): DetailVo {
