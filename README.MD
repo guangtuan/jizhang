@@ -1,3 +1,8 @@
+init account
+
+- email: admin
+- password: 123456
+
 env setting
 
 ```bash
