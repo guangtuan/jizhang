@@ -13,7 +13,7 @@ interface DetailRepo : JpaRepository<Detail, Long>,
 
     @Query(value = "select new tech.igrant.jizhang.detail.DetailVo (" +
             "d.id, " +
-            "u.id as userId, u.username as username, " +
+            "u.id as userId, u.nickname as username, " +
             "a1.id as sourceAccountId, a1.name as sourceAccountName, " +
             "a2.id as destAccountId, a2.name as destAccountName, " +
             "sub.id as subjectId, sub.name as subjectName, " +

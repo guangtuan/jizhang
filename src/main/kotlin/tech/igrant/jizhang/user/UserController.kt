@@ -5,11 +5,11 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/user")
-class UserController(private val userRepo: UserRepo) {
+class UserController(private val userRepo: UserRepo, private val userService: UserService) {
 
     @PostMapping("/{user}")
-    fun user(@PathVariable("user") account: String): UserTo? {
-        val user = userRepo.findByAccount(account)
+    fun user(@PathVariable("user") email: String): UserTo? {
+        val user = userRepo.findByEmail(email)
         user?.let {
             return UserTo.display(user)
         }
@@ -25,8 +25,7 @@ class UserController(private val userRepo: UserRepo) {
     @ApiOperation("新建一个用户")
     @PostMapping()
     fun createUser(@RequestBody userTo: UserTo): UserTo {
-        val userToSave = UserTo.dbFormat(userTo)
-        return UserTo.display(userRepo.save(userToSave))
+        return UserTo.display(userService.createUser(userTo))
     }
 
 }

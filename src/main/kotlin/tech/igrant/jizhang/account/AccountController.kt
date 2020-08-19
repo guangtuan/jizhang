@@ -22,7 +22,7 @@ class AccountController(
     fun create(@RequestBody account: Account): AccountVo {
         val userObject = userRepo.findById(account.userId).get()
         accountRepo.save(account)
-        return AccountVo.fromAccount(account, userObject.username)
+        return AccountVo.fromAccount(account, userObject.nickname)
     }
 
 }

@@ -54,7 +54,7 @@ class DetailController(
         detailRepo.save(detail)
         return DetailVo.fromPo(
                 detail,
-                username = user.username,
+                username = user.nickname,
                 sourceAccountName = accountNameMap[detail.sourceAccountId].orEmpty(),
                 destAccountName = accountNameMap[detail.destAccountId].orEmpty(),
                 subjectName = subject.name
@@ -81,7 +81,7 @@ class DetailController(
             detailRepo.save(detailInDb)
             return ResponseEntity.ok(DetailVo.fromPo(
                     detailInDb,
-                    username = user.username,
+                    username = user.nickname,
                     sourceAccountName = accountNameMap[payload.sourceAccountId].orEmpty(),
                     destAccountName = accountNameMap[payload.destAccountId].orEmpty(),
                     subjectName = subject.name

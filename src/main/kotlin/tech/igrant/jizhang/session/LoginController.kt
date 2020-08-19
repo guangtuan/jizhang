@@ -12,26 +12,30 @@ import tech.igrant.jizhang.user.UserService
 class LoginController(private val userService: UserService) {
 
     @PostMapping("login")
-    fun login(@RequestBody loginForm: LoginForm): ResponseEntity<SessionBody> {
+    fun login(@RequestBody loginForm: LoginForm): ResponseEntity<Any> {
         val token = userService.login(loginForm)
         token?.let {
-            return ResponseEntity.ok(SessionBody(it))
+            return ResponseEntity.ok(it)
         }
-        return ResponseEntity.badRequest().build()
+        return ResponseEntity.badRequest().body("错误的用户名或者密码")
     }
 
 }
 
 @ApiModel
-data class LoginForm (
-        @ApiModelProperty("用户名")
-        val username: String,
+data class LoginForm(
+        @ApiModelProperty("邮箱")
+        val email: String,
         @ApiModelProperty("密码")
         val password: String
 )
 
 @ApiModel
-data class SessionBody (
-        @ApiModelProperty("token，请求的时候放在 http header 里")
-        val token: String
+data class SessionBody(
+        @ApiModelProperty("email，后续请求的时候放在 http header 里")
+        val email: String,
+        @ApiModelProperty("token，后续请求的时候放在 http header 里")
+        val token: String,
+        @ApiModelProperty("用户名")
+        val nickname: String
 )

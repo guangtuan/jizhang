@@ -91,7 +91,7 @@ class DetailService(
             vo.destAccountName = accountService.findById(it)?.name
         }
         vo.subjectName = subjectService.findById(vo.subjectId)?.name
-        vo.username = userService.findById(detail.userId)?.username
+        vo.username = userService.findById(detail.userId)?.nickname
         return vo
     }
 
