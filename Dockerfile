@@ -11,6 +11,6 @@ COPY --from=BUILD /opt/target/jizhang-0.0.1-SNAPSHOT.jar /opt/jizhang.jar
 ENV LANG C.UTF-8
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-EXPOSE 8080
+EXPOSE 44444
 WORKDIR /opt
 CMD java -jar jizhang.jar --spring.config.location=/usr/application.properties
