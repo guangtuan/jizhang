@@ -6,13 +6,10 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
 import org.springframework.data.redis.connection.RedisPassword
-import java.util.*
-import javax.sql.DataSource
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
-
-
-
+import java.util.*
+import javax.sql.DataSource
 
 @Configuration
 class PropertyConfig {

@@ -3,7 +3,6 @@ package tech.igrant.jizhang.framework
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import tech.igrant.jizhang.session.SessionRepo
-import java.nio.charset.StandardCharsets
 import javax.servlet.Filter
 import javax.servlet.FilterChain
 import javax.servlet.ServletRequest
