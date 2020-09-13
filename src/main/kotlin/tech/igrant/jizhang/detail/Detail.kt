@@ -9,13 +9,13 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 
 @Entity
-class Detail(
+data class Detail(
         var userId: Long,
         var sourceAccountId: Long? = null,
         var destAccountId: Long? = null,
         var subjectId: Long,
         var remark: String?,
-        var createdAt: Date?,
+        var createdAt: Date,
         var updatedAt: Date?,
         var amount: Int,
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long? = null
