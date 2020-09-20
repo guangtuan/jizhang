@@ -34,7 +34,9 @@ class DetailUpdateTo(
         @ApiModelProperty("备注")
         val remark: String? = null,
         @ApiModelProperty("金额，单位分")
-        val amount: Int? = null
+        val amount: Int? = null,
+        @ApiModelProperty("明细发生时间")
+        val createdAt: Date? = null
 )
 
 @ApiModel("明细供视图使用")
