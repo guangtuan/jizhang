@@ -14,12 +14,22 @@ interface UserService {
     fun findById(id: Long): User?
     fun findByEmail(email: String): User?
     fun login(loginForm: LoginForm): SessionBody?
+    fun userMap(userIds: List<Long>): Map<Long, User>
 
     @Service
     class Impl(
             private val userRepo: UserRepo,
             private val sessionRepo: SessionRepo
     ) : UserService {
+
+        override fun userMap(userIds: List<Long>): Map<Long, User> {
+            return userRepo.findAllById(userIds).fold(mutableMapOf(), {acc, user ->
+                user.id?.let {
+                    acc[it] = user
+                }
+                acc
+            })
+        }
 
         override fun createUser(to: UserTo): User {
             val initialPassword = "123456"

@@ -19,7 +19,8 @@ class DetailService(
         private val entityManager: EntityManager,
         private val accountService: AccountService,
         private val subjectService: SubjectService,
-        private val userService: UserService
+        private val userService: UserService,
+        private val detailRepo: DetailRepo
 ) {
 
     val logger: Logger = Logger.getLogger(DetailService::class.simpleName)
@@ -93,6 +94,13 @@ class DetailService(
         vo.subjectName = subjectService.findById(vo.subjectId)?.name
         vo.username = userService.findById(detail.userId)?.nickname
         return vo
+    }
+
+    fun getByAccountId(id: Long): List<Detail> {
+        return listOf(
+                detailRepo.findByDestAccountId(id),
+                detailRepo.findBySourceAccountId(id)
+        ).flatten()
     }
 
 }

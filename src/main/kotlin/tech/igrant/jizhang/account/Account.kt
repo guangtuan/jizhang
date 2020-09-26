@@ -1,32 +1,61 @@
 package tech.igrant.jizhang.account
 
+import java.util.*
 import javax.persistence.*
 
 @Entity
 @Table(name = "account")
-class Account(
+data class Account(
         var type: String,
         var userId: Long = -1,
         var name: String,
         var description: String,
+        var createdAt: Date,
+        var updatedAt: Date,
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long? = null
 )
 
-class AccountVo(
+data class AccountTo(
+        var userId: Long = -1,
+        var type: String,
+        var name: String,
+        var description: String
+) {
+
+    fun toAccount(): Account {
+        return Account(
+                type = this.type,
+                userId = this.userId,
+                name = this.name,
+                description = this.description,
+                createdAt = Date(),
+                updatedAt = Date()
+        )
+    }
+
+}
+
+data class AccountVo(
         var id: Long,
         var type: String,
         var name: String,
+        var userId: Long,
+        var createdAt: Date,
+        var updatedAt: Date,
         var description: String,
-        var username: String
+        var nickname: String
 ) {
     companion object {
-        fun fromAccount(account: Account, username: String): AccountVo {
+        fun fromAccount(account: Account, nickname: String): AccountVo {
             return AccountVo(
                     id = account.id!!,
+                    userId = account.userId,
                     type = account.type,
                     name = account.name,
                     description = account.description,
-                    username = username
+                    nickname = nickname,
+                    createdAt = account.createdAt,
+                    updatedAt = account.updatedAt
             )
         }
     }
