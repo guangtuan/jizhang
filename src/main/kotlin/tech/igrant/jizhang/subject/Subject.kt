@@ -9,7 +9,6 @@ import javax.persistence.Id
 class Subject (
         var name: String,
         var description: String,
-        var tags: String,
         val parentId: Long? = null,
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long? = null
 ) {
@@ -34,7 +33,6 @@ class SubjectVo (
 
 class SubjectTo (
         private val name: String,
-        private val tags: String,
         private val description: String,
         private val parentId: Long
 ) {
@@ -43,7 +41,6 @@ class SubjectTo (
                 name = name,
                 description = description,
                 parentId = parentId,
-                tags = tags,
                 id = null
         )
     }

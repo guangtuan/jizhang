@@ -13,24 +13,16 @@ class SubjectController(
     @ApiOperation("列出科目")
     @GetMapping()
     fun list(): List<SubjectVo> {
-        return subjectRepo.findAll().toList()
-                .fold(
-                        mutableMapOf<Long, SubjectVo>(),
-                        { acc, po ->
-                            po.parentId?.let {
-                                acc[it]?.children?.add(po.toVo())
-                            }
-                            if (!acc.containsKey(po.id)) {
-                                po.toVo().apply {
-                                    acc[this.id] = this
-                                }
-                            }
-                            acc
-                        }
-                )
-                .values
-                .filter { s -> s.parentId == null }
-                .toList()
+        val others = -1L
+        val list = subjectRepo.findParent().map { po -> po.toVo() }.toMutableList()
+        val groupBy = subjectRepo.findChildren().map { po -> po.toVo() }.groupBy { po -> po.parentId ?: others }
+        list.add(SubjectVo(id = others, name = "其他", description = "其他", children = mutableListOf(), parentId = null))
+        for (subjectVo in list) {
+            groupBy[subjectVo.id]?.let {
+                subjectVo.children.addAll(it)
+            }
+        }
+        return list
     }
 
     @ApiOperation("新建一个科目")
