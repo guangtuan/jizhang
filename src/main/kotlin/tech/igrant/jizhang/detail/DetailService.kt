@@ -41,10 +41,11 @@ class DetailService(
             countSql.where(condition)
         }
         val startIndex = detailQuery.page * detailQuery.size
-        val resultList = entityManager.createQuery(dataSql)
-                .setFirstResult(startIndex)
-                .setMaxResults(detailQuery.size)
-                .resultList
+        val createQuery = entityManager.createQuery(dataSql)
+        if (detailQuery.size != -1) {
+            createQuery.setFirstResult(startIndex).maxResults = detailQuery.size
+        }
+        val resultList = createQuery.resultList
         val total = entityManager.createQuery(countSql).singleResult
         return PageResult(
                 content = resultList.map(this::toVo).toList(),
