@@ -17,7 +17,7 @@ class SubjectController(
         val others = -1L
         val list = subjectRepo.findParent().map { po -> po.toVo() }.toMutableList()
         val groupBy = subjectRepo.findChildren().map { po -> po.toVo() }.groupBy { po -> po.parentId ?: others }
-        list.add(SubjectVo(id = others, name = "其他", description = "其他", children = mutableListOf(), parentId = null))
+        list.add(SubjectVo(id = others, name = "其他", description = "其他", children = mutableListOf(), parentId = null, level = 1))
         for (subjectVo in list) {
             groupBy[subjectVo.id]?.let {
                 subjectVo.children.addAll(it)
