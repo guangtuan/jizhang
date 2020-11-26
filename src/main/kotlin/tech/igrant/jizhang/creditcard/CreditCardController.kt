@@ -9,15 +9,15 @@ class CreditCardController(
         private val creditCardService: CreditCardService
 ) {
 
-    @PostMapping("/")
+    @PostMapping("")
     @ResponseBody
-    fun create(request: CreditCardCreateRequest): ResponseEntity<CreditCardVo> {
+    fun create(@RequestBody request: CreditCardCreateRequest): ResponseEntity<CreditCardVo> {
         return creditCardService.create(request)
                 .map { ResponseEntity.accepted().body(it) }
                 .orElse(ResponseEntity.badRequest().build())
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     @ResponseBody
     fun list(): ResponseEntity<List<CreditCardVo>> {
         return ResponseEntity.ok(creditCardService.loadAll())

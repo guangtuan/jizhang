@@ -42,7 +42,8 @@ interface CreditCardService {
                                 updatedAt = Date(),
                                 dateBill = updateRequest.dateBill,
                                 dateRepay = updateRequest.dateRepay,
-                                amountLimit = updateRequest.amountLimit
+                                amountLimit = updateRequest.amountLimit,
+                                name = updateRequest.name
                         )
                 ).toVo()
             }

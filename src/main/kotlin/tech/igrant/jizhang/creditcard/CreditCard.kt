@@ -9,6 +9,7 @@ import javax.persistence.Id
 @Entity
 data class CreditCard(
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long?,
+        var name: String,
         var createdAt: Date,
         var dateBill: Int,
         var dateRepay: Int,
@@ -18,24 +19,27 @@ data class CreditCard(
     fun toVo(): CreditCardVo {
         return CreditCardVo(
                 id = id!!,
+                name = this.name,
                 dateBill = this.dateBill,
                 dateRepay = this.dateRepay,
                 amountLimit = this.amountLimit,
                 createdAt = this.createdAt,
-                updatedAt = this.updatedAt!!
+                updatedAt = this.updatedAt
         )
     }
 }
 
 data class CreditCardCreateRequest(
-        private val dateBill: Int,
-        private val dateRepay: Int,
-        private val amountLimit: Int
+        val dateBill: Int,
+        val dateRepay: Int,
+        val amountLimit: Int,
+        var name: String
 ) {
     fun toPo(): CreditCard {
         return CreditCard(
                 id = null,
                 createdAt = Date(),
+                name = this.name,
                 dateBill = this.dateBill,
                 dateRepay = this.dateRepay,
                 amountLimit = this.amountLimit,
@@ -47,14 +51,16 @@ data class CreditCardCreateRequest(
 data class CreditCardUpdateRequest(
         val dateBill: Int,
         val dateRepay: Int,
-        val amountLimit: Int
+        val amountLimit: Int,
+        val name: String
 )
 
 data class CreditCardVo(
         val id: Long,
-        private val dateBill: Int,
-        private val dateRepay: Int,
-        private val amountLimit: Int,
-        private val createdAt: Date,
-        private val updatedAt: Date?
+        var name: String,
+        val dateBill: Int,
+        val dateRepay: Int,
+        val amountLimit: Int,
+        val createdAt: Date,
+        val updatedAt: Date?
 )
