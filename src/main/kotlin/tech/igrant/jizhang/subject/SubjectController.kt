@@ -1,14 +1,17 @@
 package tech.igrant.jizhang.subject
 
 import io.swagger.annotations.ApiOperation
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import tech.igrant.jizhang.detail.DetailService
 
 @RestController
 @RequestMapping("/api/subjects")
 @ApiOperation("科目接口")
 class SubjectController(
-        private val subjectRepo: SubjectRepo
+        private val subjectRepo: SubjectRepo,
+        private val detailService: DetailService
 ) {
 
     @ApiOperation("列出科目")
@@ -41,6 +44,34 @@ class SubjectController(
     @PostMapping
     fun create(@RequestBody subjectTo: SubjectTo): Subject {
         return subjectRepo.save(subjectTo.toPo())
+    }
+
+    @ApiOperation("删除一个科目")
+    @DeleteMapping("{id}")
+    fun del(@PathVariable("id") id: Long): ResponseEntity<Any> {
+        val subject = subjectRepo.findById(id)
+        return subject.map {
+            when (it.level) {
+                Subject.LEVEL_BIG -> {
+                    val childSubjects = subjectRepo.findChildrenByParent(it.id!!)
+                    if (childSubjects.isEmpty()) {
+                        subjectRepo.deleteById(id)
+                        ResponseEntity.ok().build<Any>()
+                    } else {
+                        ResponseEntity.status(HttpStatus.CONFLICT).build<Any>()
+                    }
+                }
+                else -> {
+                    val detailsWithSubject = detailService.getBySubjectId(it.id!!)
+                    if (detailsWithSubject.isEmpty()) {
+                        subjectRepo.deleteById(id)
+                        ResponseEntity.ok().build<Any>()
+                    } else {
+                        ResponseEntity.status(HttpStatus.CONFLICT).build<Any>()
+                    }
+                }
+            }
+        }.orElse(ResponseEntity.notFound().build<Any>())
     }
 
 }

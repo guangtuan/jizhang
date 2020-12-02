@@ -13,6 +13,11 @@ class Subject(
         val level: Int,
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long? = null
 ) {
+    companion object {
+        const val LEVEL_BIG = 1
+        const val LEVEL_SMALL = 2
+    }
+
     fun toVo(): SubjectVo {
         return SubjectVo(
                 name = this.name,

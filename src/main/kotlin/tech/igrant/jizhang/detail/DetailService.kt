@@ -104,4 +104,8 @@ class DetailService(
         ).flatten()
     }
 
+    fun getBySubjectId(subjectId: Long): List<Detail> {
+        return detailRepo.findBySubjectId(subjectId);
+    }
+
 }

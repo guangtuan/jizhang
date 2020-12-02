@@ -34,6 +34,7 @@ interface DetailRepo : JpaRepository<Detail, Long>,
 
     fun findBySourceAccountId(accountId: Long): List<Detail>
     fun findByDestAccountId(accountId: Long): List<Detail>
+    fun findBySubjectId(subjectId: Long): List<Detail>
 
     @Query(value = "select new tech.igrant.jizhang.detail.AmountTotal (d.subjectId, sub.name as subjectName, (sum(d.amount)/100) as total) " +
             "from Detail d left join Subject sub on d.subjectId = sub.id " +
@@ -47,4 +48,5 @@ interface DetailRepo : JpaRepository<Detail, Long>,
             @Param("end") end: Date,
             @Param("subjectIds") subjectIds: List<Long>
     ): List<AmountTotal>
+
 }
