@@ -44,7 +44,15 @@ class SubjectController(
     @ApiOperation("新建一个科目")
     @PostMapping
     fun create(@RequestBody subjectTo: SubjectTo): SubjectVo {
-        return subjectRepo.save(subjectTo.toPo()).toVo(null)
+        return subjectRepo.save(subjectTo.toPo(null)).toVo(null)
+    }
+
+    @ApiOperation("更新一个科目")
+    @PutMapping("{id}")
+    fun update(@PathVariable("id") id: Long, @RequestBody subjectTo: SubjectTo): ResponseEntity<SubjectVo?> {
+        return subjectRepo.findById(id)
+                .map { ResponseEntity.ok(subjectRepo.save(subjectTo.toPo(it)).toVo(null)) }
+                .orElse(ResponseEntity.notFound().build())
     }
 
     @ApiOperation("删除一个科目")

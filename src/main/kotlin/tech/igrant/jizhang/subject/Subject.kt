@@ -51,14 +51,23 @@ class SubjectTo(
         private val parentId: Long?,
         private val level: Int
 ) {
-    fun toPo(): Subject {
-        return Subject(
-                name = name,
-                description = description,
-                parentId = parentId,
-                level = level,
+    fun toPo(po: Subject?): Subject {
+        return po?.let {
+            Subject(
+                    id = po.id,
+                    level = po.level,
+                    name = this.name,
+                    parentId = po.parentId,
+                    createdAt = po.createdAt,
+                    description = this.description
+            )
+        } ?: Subject(
                 id = null,
-                createdAt = Date()
+                name = this.name,
+                level = this.level,
+                createdAt = Date(),
+                parentId = this.parentId,
+                description = this.description
         )
     }
 }
