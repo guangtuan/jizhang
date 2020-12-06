@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import tech.igrant.jizhang.detail.DetailService
+import java.util.*
 
 @RestController
 @RequestMapping("/api/subjects")
@@ -20,7 +21,7 @@ class SubjectController(
         val others = -1L
         val parents = subjectRepo.findParent().map { po -> po.toVo(null) }.toMutableList()
         val childrenGroupedByParent = subjectRepo.findChildren().groupBy { po -> po.parentId ?: others }
-        parents.add(SubjectVo(id = others, name = "其他", description = "其他", children = mutableListOf(), parentId = null, parent = null, level = 1))
+        parents.add(SubjectVo(id = others, name = "其他", description = "其他", children = mutableListOf(), parentId = null, parent = null, level = 1, createdAt = Date()))
         for (parent in parents) {
             childrenGroupedByParent[parent.id]?.let {
                 parent.children.addAll(it.map { child -> child.toVo(parent.name) })
@@ -42,8 +43,8 @@ class SubjectController(
 
     @ApiOperation("新建一个科目")
     @PostMapping
-    fun create(@RequestBody subjectTo: SubjectTo): Subject {
-        return subjectRepo.save(subjectTo.toPo())
+    fun create(@RequestBody subjectTo: SubjectTo): SubjectVo {
+        return subjectRepo.save(subjectTo.toPo()).toVo(null)
     }
 
     @ApiOperation("删除一个科目")

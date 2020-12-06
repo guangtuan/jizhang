@@ -1,5 +1,6 @@
 package tech.igrant.jizhang.subject
 
+import java.util.*
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -11,6 +12,7 @@ class Subject(
         var description: String,
         val parentId: Long? = null,
         val level: Int,
+        val createdAt: Date,
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long? = null
 ) {
     companion object {
@@ -26,7 +28,8 @@ class Subject(
                 level = this.level,
                 children = mutableListOf(),
                 parentId = this.parentId,
-                parent = parent
+                parent = parent,
+                createdAt = this.createdAt
         )
     }
 }
@@ -38,7 +41,8 @@ class SubjectVo(
         val children: MutableList<SubjectVo>,
         val parentId: Long?,
         val parent: String?,
-        val level: Int
+        val level: Int,
+        val createdAt: Date
 )
 
 class SubjectTo(
@@ -53,7 +57,8 @@ class SubjectTo(
                 description = description,
                 parentId = parentId,
                 level = level,
-                id = null
+                id = null,
+                createdAt = Date()
         )
     }
 }
