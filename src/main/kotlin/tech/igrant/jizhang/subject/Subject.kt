@@ -18,14 +18,15 @@ class Subject(
         const val LEVEL_SMALL = 2
     }
 
-    fun toVo(): SubjectVo {
+    fun toVo(parent: String?): SubjectVo {
         return SubjectVo(
                 name = this.name,
                 description = this.description,
                 id = this.id!!,
                 level = this.level,
                 children = mutableListOf(),
-                parentId = this.parentId
+                parentId = this.parentId,
+                parent = parent
         )
     }
 }
@@ -36,6 +37,7 @@ class SubjectVo(
         val id: Long,
         val children: MutableList<SubjectVo>,
         val parentId: Long?,
+        val parent: String?,
         val level: Int
 )
 
