@@ -1,20 +1,23 @@
 package tech.igrant.jizhang.framework
 
-import com.alibaba.druid.pool.DruidDataSource
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.boot.jdbc.DataSourceBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.io.ClassPathResource
+import org.springframework.context.annotation.Primary
 import org.springframework.data.redis.connection.RedisPassword
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
-import java.util.*
 import javax.sql.DataSource
+
 
 @Configuration
 class PropertyConfig {
 
     companion object {
+
+        private val logger: Logger = LoggerFactory.getLogger(PropertyConfig::class.java)
 
         @Bean
         fun redisConnectionFactory(): LettuceConnectionFactory {
@@ -29,35 +32,19 @@ class PropertyConfig {
         }
 
         @Bean
-        fun dataSource(): DataSource {
-            val dataSource = DruidDataSource()
+        @Primary
+        fun dataSource(): DataSource? {
             val dbHost = System.getenv("JIZHANG_DB_HOST")
             val dbName = System.getenv("JIZHANG_DB_NAME")
             val dbUser = System.getenv("JIZHANG_DB_USER")
             val dbPassword = System.getenv("JIZHANG_DB_PASSWORD")
-            dataSource.url = dataSourceUrl(dbHost, dbName)
-            dataSource.username = dbUser
-            dataSource.password = dbPassword
-            return dataSource
-        }
-
-        @Bean
-        fun propertyConfigure(): PropertyPlaceholderConfigurer {
-            val placeholderConfigurerSupport = PropertyPlaceholderConfigurer()
-            val dbHost = System.getenv("JIZHANG_DB_HOST")
-            val dbName = System.getenv("JIZHANG_DB_NAME")
-            val dbUser = System.getenv("JIZHANG_DB_USER")
-            val dbPassword = System.getenv("JIZHANG_DB_PASSWORD")
-            val properties = Properties()
-            properties["spring.datasource.url"] = dataSourceUrl(dbHost, dbName)
-            properties["spring.datasource.dbname"] = dbName
-            properties["spring.datasource.username"] = dbUser
-            properties["spring.datasource.password"] = dbPassword
-            placeholderConfigurerSupport.setProperties(properties)
-            val appProperties = ClassPathResource("application.properties")
-            val druidProperties = ClassPathResource("druid.properties")
-            placeholderConfigurerSupport.setLocations(appProperties, druidProperties)
-            return placeholderConfigurerSupport
+            return DataSourceBuilder
+                    .create()
+                    .username(dbUser)
+                    .password(dbPassword)
+                    .url(dataSourceUrl(dbHost, dbName))
+                    .driverClassName("com.mysql.jdbc.Driver")
+                    .build()
         }
 
         private fun dataSourceUrl(dbHost: String, dbName: String): String {
