@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.*
 import tech.igrant.jizhang.account.AccountRepo
 import tech.igrant.jizhang.framework.PageQuery
 import tech.igrant.jizhang.framework.PageResult
+import tech.igrant.jizhang.subject.Subject
 import tech.igrant.jizhang.subject.SubjectRepo
+import tech.igrant.jizhang.user.User
 import tech.igrant.jizhang.user.UserRepo
 import java.util.*
 
@@ -46,11 +48,7 @@ class DetailController(
     @ApiOperation("增加一条明细")
     @PostMapping
     fun create(@RequestBody detail: Detail): DetailVo {
-        val user = userRepo.findById(detail.userId).get()
-        val subject = subjectRepo.findById(detail.subjectId).get()
-        val accountNameMap = accountRepo.findAllById(
-                listOf(detail.sourceAccountId, detail.destAccountId)
-        ).associateBy({ a -> a.id }, { a -> a.name })
+        val (user, subject, accountNameMap) = displayNeed(detail)
         detailRepo.save(detail)
         return DetailVo.fromPo(
                 detail,
@@ -59,6 +57,31 @@ class DetailController(
                 destAccountName = accountNameMap[detail.destAccountId].orEmpty(),
                 subjectName = subject.name
         )
+    }
+
+    @ApiOperation("批量添加明细")
+    @PostMapping("batch")
+    fun createBatch(@RequestBody details: List<Detail>): ResponseEntity<List<DetailVo>> {
+        val (user, subject, accountNameMap) = displayNeed(details[0])
+        detailRepo.saveAll(details)
+        return ResponseEntity.ok(details.map { d ->
+            DetailVo.fromPo(
+                    d,
+                    username = user.nickname,
+                    sourceAccountName = accountNameMap[d.sourceAccountId].orEmpty(),
+                    destAccountName = accountNameMap[d.destAccountId].orEmpty(),
+                    subjectName = subject.name
+            )
+        })
+    }
+
+    private fun displayNeed(detail: Detail): Triple<User, Subject, Map<Long?, String>> {
+        val user = userRepo.findById(detail.userId).get()
+        val subject = subjectRepo.findById(detail.subjectId).get()
+        val accountNameMap = accountRepo
+                .findAllById(listOf(detail.sourceAccountId, detail.destAccountId))
+                .associateBy({ a -> a.id }, { a -> a.name })
+        return Triple(user, subject, accountNameMap)
     }
 
     @ApiOperation("更新一条明细")
