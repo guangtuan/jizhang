@@ -18,8 +18,16 @@ data class Detail(
         var createdAt: Date,
         var updatedAt: Date?,
         var amount: Int,
+        var splited: Int,
+        var parentId: Int?,
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long? = null
-)
+) {
+    companion object {
+        const val NOT_SPLITED = 0
+        const val SPLITED = 1
+        const val SPLIT_PARENT = 2
+    }
+}
 
 @ApiModel("明细更新所传的对象")
 class DetailUpdateTo(
@@ -36,7 +44,11 @@ class DetailUpdateTo(
         @ApiModelProperty("金额，单位分")
         val amount: Int? = null,
         @ApiModelProperty("明细发生时间")
-        val createdAt: Date? = null
+        val createdAt: Date? = null,
+        @ApiModelProperty("是否为分摊出来的明细")
+        var splited: Int = Detail.NOT_SPLITED,
+        @ApiModelProperty("如果是分摊出来的明细，这个字段表示分摊的来源")
+        var parentId: Int?
 )
 
 @ApiModel("明细供视图使用")
@@ -57,7 +69,11 @@ data class DetailVo(
         var remark: String?,
         var createdAt: Date?,
         var updatedAt: Date?,
-        var amount: Int
+        var amount: Int,
+        @ApiModelProperty("是否由分摊出来的明细")
+        var splited: Int?,
+        @ApiModelProperty("如果是分摊出来的明细，这个字段表示分摊的来源")
+        var parentId: Int?
 ) {
     companion object {
         fun fromPo(
@@ -80,7 +96,9 @@ data class DetailVo(
                     subjectId = po.subjectId,
                     destAccountId = po.destAccountId,
                     sourceAccountId = po.sourceAccountId,
-                    userId = po.userId
+                    userId = po.userId,
+                    splited = po.splited,
+                    parentId = po.parentId
             )
         }
     }

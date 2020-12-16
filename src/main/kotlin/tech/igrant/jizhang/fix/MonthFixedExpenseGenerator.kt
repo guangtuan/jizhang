@@ -25,7 +25,9 @@ class MonthFixedExpenseGenerator : FixedExpenseGenerator {
                     amount = fixedExpenses.amount,
                     remark = fixedExpenses.remark,
                     subjectId = fixedExpenses.subjectId,
-                    updatedAt = createdAt
+                    updatedAt = createdAt,
+                    splited = Detail.NOT_SPLITED,
+                    parentId = null
             )
         }
     }

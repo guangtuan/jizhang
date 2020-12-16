@@ -17,7 +17,7 @@ interface DetailRepo : JpaRepository<Detail, Long>,
             "a1.id as sourceAccountId, a1.name as sourceAccountName, " +
             "a2.id as destAccountId, a2.name as destAccountName, " +
             "sub.id as subjectId, sub.name as subjectName, " +
-            "d.remark, d.createdAt, d.updatedAt, d.amount) " +
+            "d.remark, d.createdAt, d.updatedAt, d.amount, d.splited, d.parentId) " +
             "from Detail d " +
             "left join User u " +
             "on d.userId = u.id " +
