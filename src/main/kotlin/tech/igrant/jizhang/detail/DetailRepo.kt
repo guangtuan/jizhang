@@ -4,9 +4,11 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import java.util.*
+import javax.transaction.Transactional
 
 interface DetailRepo : JpaRepository<Detail, Long>,
         JpaSpecificationExecutor<Detail> {
@@ -48,5 +50,10 @@ interface DetailRepo : JpaRepository<Detail, Long>,
             @Param("end") end: Date,
             @Param("subjectIds") subjectIds: List<Long>
     ): List<AmountTotal>
+
+    @Transactional
+    @Modifying
+    @Query(nativeQuery = true, value = "update detail set splited = :flag where id = :id")
+    fun updateSplitFlag(@Param("id") id: Long, @Param("flag") flag: Int)
 
 }

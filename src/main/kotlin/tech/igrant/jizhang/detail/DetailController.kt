@@ -26,6 +26,14 @@ class DetailController(
         private val detailService: DetailService
 ) {
 
+    @ApiOperation("标记为分摊的来源")
+    @PutMapping("/{id}/splitFlag")
+    @ResponseBody
+    fun markAsSplitParent(@PathVariable("id") id: Long, @RequestParam("flag") flag: Int): ResponseEntity<String> {
+        detailService.updateSplitFlag(id, flag)
+        return ResponseEntity.ok("更新成功");
+    }
+
     @ApiOperation("查询明细")
     @PostMapping("query")
     @ResponseBody

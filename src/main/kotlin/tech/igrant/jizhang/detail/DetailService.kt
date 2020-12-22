@@ -108,4 +108,9 @@ class DetailService(
         return detailRepo.findBySubjectId(subjectId);
     }
 
+    fun updateSplitFlag(id: Long, flag: Int) {
+        detailRepo.updateSplitFlag(id, flag);
+    }
+
+
 }
