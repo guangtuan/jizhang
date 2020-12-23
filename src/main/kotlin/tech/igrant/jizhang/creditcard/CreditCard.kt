@@ -14,9 +14,10 @@ data class CreditCard(
         var dateBill: Int,
         var dateRepay: Int,
         var amountLimit: Int,
-        var updatedAt: Date?
+        var updatedAt: Date?,
+        var userId: Long
 ) {
-    fun toVo(): CreditCardVo {
+    fun toVo(nickname: String): CreditCardVo {
         return CreditCardVo(
                 id = id!!,
                 name = this.name,
@@ -24,7 +25,9 @@ data class CreditCard(
                 dateRepay = this.dateRepay,
                 amountLimit = this.amountLimit,
                 createdAt = this.createdAt,
-                updatedAt = this.updatedAt
+                updatedAt = this.updatedAt,
+                userId = this.userId,
+                nickname = nickname
         )
     }
 }
@@ -33,7 +36,8 @@ data class CreditCardCreateRequest(
         val dateBill: Int,
         val dateRepay: Int,
         val amountLimit: Int,
-        var name: String
+        val userId: Long,
+        val name: String
 ) {
     fun toPo(): CreditCard {
         return CreditCard(
@@ -43,7 +47,8 @@ data class CreditCardCreateRequest(
                 dateBill = this.dateBill,
                 dateRepay = this.dateRepay,
                 amountLimit = this.amountLimit,
-                updatedAt = null
+                updatedAt = null,
+                userId = this.userId
         )
     }
 }
@@ -52,7 +57,8 @@ data class CreditCardUpdateRequest(
         val dateBill: Int,
         val dateRepay: Int,
         val amountLimit: Int,
-        val name: String
+        val name: String,
+        val userId: Long
 )
 
 data class CreditCardVo(
@@ -62,5 +68,7 @@ data class CreditCardVo(
         val dateRepay: Int,
         val amountLimit: Int,
         val createdAt: Date,
-        val updatedAt: Date?
+        val updatedAt: Date?,
+        var userId: Long,
+        var nickname: String
 )

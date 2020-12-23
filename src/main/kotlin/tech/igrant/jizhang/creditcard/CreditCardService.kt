@@ -2,6 +2,7 @@ package tech.igrant.jizhang.creditcard
 
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Service
+import tech.igrant.jizhang.user.UserService
 import java.util.*
 
 interface CreditCardRepo : CrudRepository<CreditCard, Long> {
@@ -18,35 +19,43 @@ interface CreditCardService {
 
     @Service
     class Impl(
-            private val creditCardRepo: CreditCardRepo
+            private val creditCardRepo: CreditCardRepo,
+            private val userService: UserService
     ) : CreditCardService {
         override fun loadAll(): List<CreditCardVo> {
-            return creditCardRepo.findAll().mapNotNull { c -> c.toVo() }.toList()
+            val creditCards = creditCardRepo.findAll()
+            val userMap = userService.userMap(userIds = creditCards.map { it.userId }.distinct().toList())
+            return creditCards.mapNotNull { c -> c.toVo(userMap[c.userId]?.nickname ?: "") }.toList()
         }
 
         override fun create(createRequest: CreditCardCreateRequest): Optional<CreditCardVo> {
-            val save = creditCardRepo.save(createRequest.toPo())
-            if (save.id == null) {
-                return Optional.empty()
-            }
-            return Optional.of(save.toVo())
+            return userService.findById(createRequest.userId)?.let {
+                val save = creditCardRepo.save(createRequest.toPo())
+                if (save.id == null) {
+                    return Optional.empty()
+                }
+                return Optional.of(save.toVo(it.nickname))
+            } ?: Optional.empty()
         }
 
         override fun update(id: Long, updateRequest: CreditCardUpdateRequest): Optional<CreditCardVo> {
-            val dataInDb = creditCardRepo.findById(id)
-            return dataInDb.map {
-                creditCardRepo.save(
-                        CreditCard(
-                                id = id,
-                                createdAt = it.createdAt,
-                                updatedAt = Date(),
-                                dateBill = updateRequest.dateBill,
-                                dateRepay = updateRequest.dateRepay,
-                                amountLimit = updateRequest.amountLimit,
-                                name = updateRequest.name
-                        )
-                ).toVo()
-            }
+            return userService.findById(updateRequest.userId)?.let { user ->
+                val dataInDb = creditCardRepo.findById(id)
+                return dataInDb.map {
+                    creditCardRepo.save(
+                            CreditCard(
+                                    id = id,
+                                    createdAt = it.createdAt,
+                                    updatedAt = Date(),
+                                    dateBill = updateRequest.dateBill,
+                                    dateRepay = updateRequest.dateRepay,
+                                    amountLimit = updateRequest.amountLimit,
+                                    name = updateRequest.name,
+                                    userId = user.id!!
+                            )
+                    ).toVo(user.nickname)
+                }
+            } ?: Optional.empty()
         }
 
     }
