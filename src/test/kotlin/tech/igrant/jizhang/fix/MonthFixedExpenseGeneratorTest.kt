@@ -4,7 +4,7 @@ import org.apache.commons.lang3.time.DateUtils
 import org.junit.Assert
 import org.junit.Test
 import tech.igrant.jizhang.ext.FMT_YYYY_MM_dd_HH_mm_ss
-import tech.igrant.jizhang.ext.fmt
+import java.time.format.DateTimeFormatter
 
 class MonthFixedExpenseGeneratorTest {
 
@@ -34,7 +34,7 @@ class MonthFixedExpenseGeneratorTest {
                 "2020-05-05 00:00:00"
         )
         details.forEachIndexed { index, detail ->
-            Assert.assertEquals(expected[index], detail.createdAt.fmt(FMT_YYYY_MM_dd_HH_mm_ss))
+            Assert.assertEquals(expected[index], detail.createdAt.format(DateTimeFormatter.ofPattern(FMT_YYYY_MM_dd_HH_mm_ss)))
         }
     }
 }

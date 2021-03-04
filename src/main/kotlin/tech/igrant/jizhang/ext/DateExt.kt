@@ -3,8 +3,10 @@ package tech.igrant.jizhang.ext
 import org.apache.commons.lang3.time.DateFormatUtils
 import org.apache.commons.lang3.time.DateUtils
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
+
 
 fun Date.getStartOfTomorrow(): Date {
     return DateUtils.setSeconds(
@@ -23,6 +25,10 @@ fun Date.fmt(pattern: String): String {
 
 fun LocalDate.toDate(): Date {
     return Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant())
+}
+
+fun Date.toLocalDateTime(): LocalDateTime {
+    return LocalDateTime.ofInstant(this.toInstant(), ZoneId.systemDefault());
 }
 
 const val FMT_YYYY_MM_dd_HH_mm_ss = "YYYY-MM-dd HH:mm:ss"

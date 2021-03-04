@@ -2,6 +2,8 @@ package tech.igrant.jizhang.detail
 
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
+import tech.igrant.jizhang.ext.toLocalDateTime
+import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -15,8 +17,8 @@ data class Detail(
         var destAccountId: Long? = null,
         var subjectId: Long,
         var remark: String?,
-        var createdAt: Date,
-        var updatedAt: Date?,
+        var createdAt: LocalDateTime,
+        var updatedAt: LocalDateTime?,
         var amount: Int,
         var splited: Int,
         var parentId: Int?,
@@ -26,6 +28,35 @@ data class Detail(
         const val NOT_SPLITED = 0
         const val SPLITED = 1
         const val SPLIT_PARENT = 2
+    }
+}
+
+data class DetailTo (
+        var userId: Long,
+        var sourceAccountId: Long? = null,
+        var destAccountId: Long? = null,
+        var subjectId: Long,
+        var remark: String?,
+        var createdAt: Date,
+        var updatedAt: Date?,
+        var amount: Int,
+        var splited: Int,
+        var parentId: Int?
+) {
+    fun toDomain(): Detail {
+        return Detail(
+                userId = this.userId,
+                sourceAccountId = this.sourceAccountId,
+                destAccountId =  this.destAccountId,
+                subjectId = this.subjectId,
+                remark = this.remark,
+                createdAt = this.createdAt.toLocalDateTime(),
+                updatedAt = this.updatedAt?.toLocalDateTime(),
+                amount = this.amount,
+                splited = this.splited,
+                parentId = this.parentId,
+                id = null
+        )
     }
 }
 
@@ -67,8 +98,8 @@ data class DetailVo(
         val subjectId: Long,
         var subjectName: String?,
         var remark: String?,
-        var createdAt: Date?,
-        var updatedAt: Date?,
+        var createdAt: LocalDateTime?,
+        var updatedAt: LocalDateTime?,
         var amount: Int,
         @ApiModelProperty("是否由分摊出来的明细")
         var splited: Int?,

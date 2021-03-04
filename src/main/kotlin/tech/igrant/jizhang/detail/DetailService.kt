@@ -3,11 +3,12 @@ package tech.igrant.jizhang.detail
 import org.springframework.stereotype.Service
 import tech.igrant.jizhang.account.AccountService
 import tech.igrant.jizhang.ext.toJSON
+import tech.igrant.jizhang.ext.toLocalDateTime
 import tech.igrant.jizhang.framework.PageQuery
 import tech.igrant.jizhang.framework.PageResult
 import tech.igrant.jizhang.subject.SubjectService
 import tech.igrant.jizhang.user.UserService
-import java.util.*
+import java.time.LocalDateTime
 import java.util.logging.Logger
 import javax.persistence.EntityManager
 import javax.persistence.criteria.CriteriaBuilder
@@ -32,7 +33,7 @@ class DetailService(
         val countQuery = criteriaBuilder.createQuery(Long::class.java)
         val data = rowsQuery.from(Detail::class.java)
         val count = countQuery.from(Detail::class.java)
-        val createdAtColumn = data.get<Any>("createdAt")
+        val createdAtColumn = data.get<LocalDateTime>("createdAt")
         val dataSql = rowsQuery.select(data).orderBy(criteriaBuilder.desc(createdAtColumn))
         val countSql = countQuery.select(criteriaBuilder.count(count))
         if (DetailQuery.meaningful(detailQuery.queryParam)) {
@@ -77,8 +78,12 @@ class DetailService(
         }
         detailQuery.queryParam.start?.let {
             detailQuery.queryParam.end?.let {
-                val createdAtRow = data.get<Date>("createdAt")
-                conditions.add(builder.between(createdAtRow, detailQuery.queryParam.start, detailQuery.queryParam.end))
+                val createdAtRow = data.get<LocalDateTime>("createdAt")
+                conditions.add(builder.between(
+                        createdAtRow,
+                        detailQuery.queryParam.start.toLocalDateTime(),
+                        detailQuery.queryParam.end.toLocalDateTime()
+                ))
             }
         }
         return conditions.reduce { acc, curr -> builder.and(acc, curr) }

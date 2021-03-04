@@ -2,8 +2,9 @@ package tech.igrant.jizhang.fix
 
 import tech.igrant.jizhang.detail.Detail
 import tech.igrant.jizhang.ext.fmt
-import tech.igrant.jizhang.ext.toDate
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 
 @CanHandleFixedForm(FixedForm.MONTH)
@@ -16,7 +17,7 @@ class MonthFixedExpenseGenerator : FixedExpenseGenerator {
                 LocalDate.parse(fixedExpenses.end.fmt("YYYY-MM-dd")).withDayOfMonth(fixedExpenses.indexInPeriod)
         )
         return IntRange(0, monthCount.toInt()).map {
-            val createdAt = startLocalDate.plusMonths(it.toLong()).toDate()
+            val createdAt = LocalDateTime.of(startLocalDate.plusMonths(it.toLong()), LocalTime.of(0, 0, 0))
             Detail(
                     userId = fixedExpenses.userId,
                     sourceAccountId = fixedExpenses.sourceAccountId,

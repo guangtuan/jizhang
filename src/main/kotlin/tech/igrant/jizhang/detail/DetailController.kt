@@ -14,7 +14,7 @@ import tech.igrant.jizhang.subject.Subject
 import tech.igrant.jizhang.subject.SubjectRepo
 import tech.igrant.jizhang.user.User
 import tech.igrant.jizhang.user.UserRepo
-import java.util.*
+import java.time.LocalDateTime
 
 @RestController
 @RequestMapping("/api/details")
@@ -55,8 +55,10 @@ class DetailController(
 
     @ApiOperation("增加一条明细")
     @PostMapping
-    fun create(@RequestBody detail: Detail): DetailVo {
+    fun create(@RequestBody detailTo: DetailTo): DetailVo {
+        val detail = detailTo.toDomain()
         val (user, subject, accountNameMap) = displayNeed(detail)
+        detail.createdAt = detail.createdAt.plusSeconds(1)
         detailRepo.save(detail)
         return DetailVo.fromPo(
                 detail,
@@ -108,7 +110,7 @@ class DetailController(
                     listOf(payload.sourceAccountId, payload.destAccountId)
             ).associateBy({ a -> a.id }, { a -> a.name })
             BeanUtils.copyProperties(payload, detailInDb)
-            detailInDb.updatedAt = Date()
+            detailInDb.updatedAt = LocalDateTime.now()
             detailRepo.save(detailInDb)
             return ResponseEntity.ok(DetailVo.fromPo(
                     detailInDb,
