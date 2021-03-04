@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import tech.igrant.jizhang.detail.DetailService
+import java.time.LocalDateTime
 import java.util.*
 
 @RestController
@@ -21,7 +22,7 @@ class SubjectController(
         val others = -1L
         val parents = subjectRepo.findParent().map { po -> po.toVo(null) }.toMutableList()
         val childrenGroupedByParent = subjectRepo.findChildren().groupBy { po -> po.parentId ?: others }
-        parents.add(SubjectVo(id = others, name = "其他", description = "其他", children = mutableListOf(), parentId = null, parent = null, level = 1, createdAt = Date()))
+        parents.add(SubjectVo(id = others, name = "其他", description = "其他", children = mutableListOf(), parentId = null, parent = null, level = 1, createdAt = LocalDateTime.now()))
         for (parent in parents) {
             childrenGroupedByParent[parent.id]?.let {
                 parent.children.addAll(it.map { child -> child.toVo(parent.name) })

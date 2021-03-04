@@ -1,5 +1,7 @@
 package tech.igrant.jizhang.subject
 
+import tech.igrant.jizhang.ext.toLocalDateTime
+import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -29,7 +31,7 @@ class Subject(
                 children = mutableListOf(),
                 parentId = this.parentId,
                 parent = parent,
-                createdAt = this.createdAt
+                createdAt = this.createdAt.toLocalDateTime()
         )
     }
 }
@@ -42,7 +44,7 @@ class SubjectVo(
         val parentId: Long?,
         val parent: String?,
         val level: Int,
-        val createdAt: Date
+        val createdAt: LocalDateTime
 )
 
 class SubjectTo(
