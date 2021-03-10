@@ -32,6 +32,8 @@ data class LoginForm(
 
 @ApiModel
 data class SessionBody(
+        @ApiModelProperty("用户id")
+        val userId: Long,
         @ApiModelProperty("email，后续请求的时候放在 http header 里")
         val email: String,
         @ApiModelProperty("token，后续请求的时候放在 http header 里")

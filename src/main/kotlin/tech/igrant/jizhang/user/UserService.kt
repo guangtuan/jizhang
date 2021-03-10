@@ -23,7 +23,7 @@ interface UserService {
     ) : UserService {
 
         override fun userMap(userIds: List<Long>): Map<Long, User> {
-            return userRepo.findAllById(userIds).fold(mutableMapOf(), {acc, user ->
+            return userRepo.findAllById(userIds).fold(mutableMapOf(), { acc, user ->
                 user.id?.let {
                     acc[it] = user
                 }
@@ -61,8 +61,17 @@ interface UserService {
             user?.let {
                 if (PasswordEncrypt.valid(loginForm.password, it.password, it.salt)) {
                     val token = UUID.randomUUID().toString().replace("-", "")
+                    sessionRepo.getToken(loginForm.email)?.let { tokenExists ->
+                        return SessionBody(
+                                userId = user.id!!,
+                                email = user.email,
+                                token = tokenExists,
+                                nickname = user.nickname
+                        )
+                    }
                     sessionRepo.save(it.email, token)
                     return SessionBody(
+                            userId = user.id!!,
                             email = user.email,
                             token = token,
                             nickname = user.nickname

@@ -7,6 +7,7 @@ interface SessionRepo {
 
     fun invalid(email: String, token: String): Boolean
     fun save(email: String, token: String)
+    fun getToken(email: String): String?
 
     @Component
     class Impl(private val stringRedisTemplate: StringRedisTemplate) : SessionRepo {
@@ -17,6 +18,10 @@ interface SessionRepo {
 
         private fun String.exchangeToken(): String? {
             return stringRedisTemplate.opsForValue().get(this.toMainKey())
+        }
+
+        override fun getToken(email: String): String? {
+            return email.exchangeToken()
         }
 
         override fun invalid(email: String, token: String): Boolean {
