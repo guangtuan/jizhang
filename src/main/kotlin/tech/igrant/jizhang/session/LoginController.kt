@@ -3,13 +3,17 @@ package tech.igrant.jizhang.session
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import tech.igrant.jizhang.user.UserService
 
 @RestController
 class LoginController(private val userService: UserService) {
+
+    @RequestMapping("ping")
+    @ResponseBody
+    fun ping(): ResponseEntity<Map<String, String>> {
+        return ResponseEntity.ok(mapOf(Pair("message", "ping")))
+    }
 
     @PostMapping("login")
     fun login(@RequestBody loginForm: LoginForm): ResponseEntity<Any> {
