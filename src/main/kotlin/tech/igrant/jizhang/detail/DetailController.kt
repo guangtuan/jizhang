@@ -69,21 +69,40 @@ class DetailController(
         )
     }
 
-    @ApiOperation("批量添加明细")
+    @ApiOperation("批量创建")
     @PostMapping("batch")
-    fun createBatch(@RequestBody details: List<Detail>): ResponseEntity<List<DetailVo>> {
-        val (user, subject, accountNameMap) = displayNeed(details[0])
-        detailRepo.saveAll(details)
-        return ResponseEntity.ok(details.map { d ->
+    @ResponseBody
+    fun createBatch(@RequestBody detailTos: List<DetailTo>): List<DetailVo> {
+        return detailTos.map { detailTo ->
+            val detail = detailTo.toDomain()
+            val (user, subject, accountNameMap) = displayNeed(detail)
+            detail.createdAt = detail.createdAt.plusSeconds(1)
+            detailRepo.save(detail)
             DetailVo.fromPo(
-                    d,
+                    detail,
                     username = user.nickname,
-                    sourceAccountName = accountNameMap[d.sourceAccountId].orEmpty(),
-                    destAccountName = accountNameMap[d.destAccountId].orEmpty(),
+                    sourceAccountName = accountNameMap[detail.sourceAccountId].orEmpty(),
+                    destAccountName = accountNameMap[detail.destAccountId].orEmpty(),
                     subjectName = subject.name
             )
-        })
+        }
     }
+
+//    @ApiOperation("批量添加明细")
+//    @PostMapping("batch")
+//    fun createBatch(@RequestBody details: List<Detail>): ResponseEntity<List<DetailVo>> {
+//        val (user, subject, accountNameMap) = displayNeed(details[0])
+//        detailRepo.saveAll(details)
+//        return ResponseEntity.ok(details.map { d ->
+//            DetailVo.fromPo(
+//                    d,
+//                    username = user.nickname,
+//                    sourceAccountName = accountNameMap[d.sourceAccountId].orEmpty(),
+//                    destAccountName = accountNameMap[d.destAccountId].orEmpty(),
+//                    subjectName = subject.name
+//            )
+//        })
+//    }
 
     private fun displayNeed(detail: Detail): Triple<User, Subject, Map<Long?, String>> {
         val user = userRepo.findById(detail.userId).get()
