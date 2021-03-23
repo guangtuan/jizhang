@@ -88,22 +88,6 @@ class DetailController(
         }
     }
 
-//    @ApiOperation("批量添加明细")
-//    @PostMapping("batch")
-//    fun createBatch(@RequestBody details: List<Detail>): ResponseEntity<List<DetailVo>> {
-//        val (user, subject, accountNameMap) = displayNeed(details[0])
-//        detailRepo.saveAll(details)
-//        return ResponseEntity.ok(details.map { d ->
-//            DetailVo.fromPo(
-//                    d,
-//                    username = user.nickname,
-//                    sourceAccountName = accountNameMap[d.sourceAccountId].orEmpty(),
-//                    destAccountName = accountNameMap[d.destAccountId].orEmpty(),
-//                    subjectName = subject.name
-//            )
-//        })
-//    }
-
     private fun displayNeed(detail: Detail): Triple<User, Subject, Map<Long?, String>> {
         val user = userRepo.findById(detail.userId).get()
         val subject = subjectRepo.findById(detail.subjectId).get()
