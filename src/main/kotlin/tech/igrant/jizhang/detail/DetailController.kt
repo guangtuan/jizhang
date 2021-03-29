@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import tech.igrant.jizhang.account.AccountRepo
+import tech.igrant.jizhang.ext.toLocalDateTime
 import tech.igrant.jizhang.framework.PageQuery
 import tech.igrant.jizhang.framework.PageResult
 import tech.igrant.jizhang.subject.Subject
@@ -113,6 +114,9 @@ class DetailController(
                     listOf(payload.sourceAccountId, payload.destAccountId)
             ).associateBy({ a -> a.id }, { a -> a.name })
             BeanUtils.copyProperties(payload, detailInDb)
+            payload.createdAt?.let {
+                detailInDb.createdAt = it.toLocalDateTime()
+            }
             detailInDb.updatedAt = LocalDateTime.now()
             detailRepo.save(detailInDb)
             return ResponseEntity.ok(DetailVo.fromPo(
