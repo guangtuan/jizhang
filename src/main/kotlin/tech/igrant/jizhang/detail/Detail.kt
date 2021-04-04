@@ -60,28 +60,6 @@ data class DetailTo (
     }
 }
 
-@ApiModel("明细更新所传的对象")
-class DetailUpdateTo(
-        @ApiModelProperty("用户id")
-        val userId: Long,
-        @ApiModelProperty("来源账户id，如用支付宝吃饭，来源账户就是支付宝")
-        val sourceAccountId: Long? = null,
-        @ApiModelProperty("目标账户id，如发工资的时候，目标账户就是工资卡")
-        val destAccountId: Long? = null,
-        @ApiModelProperty("科目id")
-        val subjectId: Long,
-        @ApiModelProperty("备注")
-        val remark: String? = null,
-        @ApiModelProperty("金额，单位分")
-        val amount: Int? = null,
-        @ApiModelProperty("明细发生时间")
-        val createdAt: Date? = null,
-        @ApiModelProperty("是否为分摊出来的明细")
-        var splited: Int = Detail.NOT_SPLITED,
-        @ApiModelProperty("如果是分摊出来的明细，这个字段表示分摊的来源")
-        var parentId: Int?
-)
-
 @ApiModel("明细供视图使用")
 data class DetailVo(
         var id: Long,

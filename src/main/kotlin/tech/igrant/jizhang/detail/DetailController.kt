@@ -103,7 +103,7 @@ class DetailController(
     @ResponseBody
     fun update(
             @ApiParam("需要更新的明细的id") @PathVariable("id") id: Long,
-            @ApiParam("明细更新所传的对象") @RequestBody payload: DetailUpdateTo
+            @ApiParam("明细更新所传的对象") @RequestBody payload: DetailTo
     ): ResponseEntity<DetailVo> {
         val detailInDbOpt = detailRepo.findById(id)
         if (detailInDbOpt.isPresent) {
@@ -114,7 +114,7 @@ class DetailController(
                     listOf(payload.sourceAccountId, payload.destAccountId)
             ).associateBy({ a -> a.id }, { a -> a.name })
             BeanUtils.copyProperties(payload, detailInDb)
-            payload.createdAt?.let {
+            payload.createdAt.let {
                 detailInDb.createdAt = it.toLocalDateTime()
             }
             detailInDb.updatedAt = LocalDateTime.now()
