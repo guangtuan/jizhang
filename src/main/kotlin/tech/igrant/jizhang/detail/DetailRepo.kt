@@ -19,7 +19,7 @@ interface DetailRepo : JpaRepository<Detail, Long>,
             "a1.id as sourceAccountId, a1.name as sourceAccountName, " +
             "a2.id as destAccountId, a2.name as destAccountName, " +
             "sub.id as subjectId, sub.name as subjectName, " +
-            "d.remark, d.createdAt, d.updatedAt, d.amount, d.splited, d.parentId) " +
+            "d.remark, d.createdAt, d.updatedAt, d.amount) " +
             "from Detail d " +
             "left join User u " +
             "on d.userId = u.id " +
@@ -50,10 +50,5 @@ interface DetailRepo : JpaRepository<Detail, Long>,
             @Param("end") end: Date,
             @Param("subjectIds") subjectIds: List<Long>
     ): List<AmountTotal>
-
-    @Transactional
-    @Modifying
-    @Query(nativeQuery = true, value = "update detail set splited = :flag where id = :id")
-    fun updateSplitFlag(@Param("id") id: Long, @Param("flag") flag: Int)
 
 }
