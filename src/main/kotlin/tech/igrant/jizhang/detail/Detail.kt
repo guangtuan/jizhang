@@ -20,16 +20,8 @@ data class Detail(
         var createdAt: LocalDateTime,
         var updatedAt: LocalDateTime?,
         var amount: Int,
-        var splited: Int,
-        var parentId: Int?,
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long? = null
-) {
-    companion object {
-        const val NOT_SPLITED = 0
-        const val SPLITED = 1
-        const val SPLIT_PARENT = 2
-    }
-}
+)
 
 data class DetailTo (
         var userId: Long,
@@ -39,9 +31,7 @@ data class DetailTo (
         var remark: String?,
         var createdAt: Date,
         var updatedAt: Date?,
-        var amount: Int,
-        var splited: Int,
-        var parentId: Int?
+        var amount: Int
 ) {
     fun toDomain(): Detail {
         return Detail(
@@ -53,8 +43,6 @@ data class DetailTo (
                 createdAt = this.createdAt.toLocalDateTime(),
                 updatedAt = this.updatedAt?.toLocalDateTime(),
                 amount = this.amount,
-                splited = this.splited,
-                parentId = this.parentId,
                 id = null
         )
     }
@@ -78,11 +66,7 @@ data class DetailVo(
         var remark: String?,
         var createdAt: LocalDateTime?,
         var updatedAt: LocalDateTime?,
-        var amount: Int,
-        @ApiModelProperty("是否由分摊出来的明细")
-        var splited: Int?,
-        @ApiModelProperty("如果是分摊出来的明细，这个字段表示分摊的来源")
-        var parentId: Int?
+        var amount: Int
 ) {
     companion object {
         fun fromPo(
@@ -105,9 +89,7 @@ data class DetailVo(
                     subjectId = po.subjectId,
                     destAccountId = po.destAccountId,
                     sourceAccountId = po.sourceAccountId,
-                    userId = po.userId,
-                    splited = po.splited,
-                    parentId = po.parentId
+                    userId = po.userId
             )
         }
     }
