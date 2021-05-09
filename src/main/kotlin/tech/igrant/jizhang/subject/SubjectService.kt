@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class SubjectService(
-        private val subjectRepo: SubjectRepo
+    private val subjectRepo: SubjectRepo
 ) {
 
     fun findById(id: Long): Subject? {
@@ -13,6 +13,18 @@ class SubjectService(
             return opt.get()
         }
         return null
+    }
+
+    fun subjectMap(): Map<Long, Subject> {
+        return subjectRepo.findAll().fold(
+            mutableMapOf(),
+            { acc, subject ->
+                subject.id?.let {
+                    acc[it] = subject
+                }
+                acc
+            }
+        )
     }
 
 }

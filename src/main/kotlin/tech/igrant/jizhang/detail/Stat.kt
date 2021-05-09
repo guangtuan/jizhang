@@ -11,5 +11,6 @@ class AmountTotal(
 class AmountTotalQuery(
         val start: Date,
         val end: Date,
+        val level: Int,
         val subjects: List<Long>
 )
