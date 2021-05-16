@@ -15,11 +15,12 @@ interface UserService {
     fun findByEmail(email: String): User?
     fun login(loginForm: LoginForm): SessionBody?
     fun userMap(userIds: List<Long>): Map<Long, User>
+    fun userMap(): Map<Long, User>
 
     @Service
     class Impl(
-            private val userRepo: UserRepo,
-            private val sessionRepo: SessionRepo
+        private val userRepo: UserRepo,
+        private val sessionRepo: SessionRepo
     ) : UserService {
 
         override fun userMap(userIds: List<Long>): Map<Long, User> {
@@ -31,17 +32,28 @@ interface UserService {
             })
         }
 
+        override fun userMap(): Map<Long, User> {
+            return userRepo.findAll().fold(mutableMapOf(), { acc, user ->
+                user.id?.let {
+                    acc[it] = user
+                }
+                acc
+            })
+        }
+
         override fun createUser(to: UserTo): User {
             val initialPassword = "123456"
             val salt = randomString()
             val password = PasswordEncrypt.encrypt(initialPassword, salt)
-            return userRepo.save(User(
+            return userRepo.save(
+                User(
                     email = to.email,
                     avatar = to.avatar,
                     nickname = to.nickname,
                     password = password,
                     salt = salt
-            ))
+                )
+            )
         }
 
         override fun findByEmail(email: String): User? {
@@ -63,18 +75,18 @@ interface UserService {
                     val token = UUID.randomUUID().toString().replace("-", "")
                     sessionRepo.getToken(loginForm.email)?.let { tokenExists ->
                         return SessionBody(
-                                userId = user.id!!,
-                                email = user.email,
-                                token = tokenExists,
-                                nickname = user.nickname
+                            userId = user.id!!,
+                            email = user.email,
+                            token = tokenExists,
+                            nickname = user.nickname
                         )
                     }
                     sessionRepo.save(it.email, token)
                     return SessionBody(
-                            userId = user.id!!,
-                            email = user.email,
-                            token = token,
-                            nickname = user.nickname
+                        userId = user.id!!,
+                        email = user.email,
+                        token = token,
+                        nickname = user.nickname
                     )
                 }
             }

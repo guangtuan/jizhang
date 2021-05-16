@@ -3,8 +3,6 @@ package tech.igrant.jizhang.detail
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import org.springframework.beans.BeanUtils
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import tech.igrant.jizhang.account.AccountRepo
@@ -20,11 +18,11 @@ import java.time.LocalDateTime
 @RestController
 @RequestMapping("/api/details")
 class DetailController(
-        private val userRepo: UserRepo,
-        private val subjectRepo: SubjectRepo,
-        private val accountRepo: AccountRepo,
-        private val detailRepo: DetailRepo,
-        private val detailService: DetailService
+    private val userRepo: UserRepo,
+    private val subjectRepo: SubjectRepo,
+    private val accountRepo: AccountRepo,
+    private val detailRepo: DetailRepo,
+    private val detailService: DetailService
 ) {
 
     @ApiOperation("查询明细")
@@ -32,12 +30,6 @@ class DetailController(
     @ResponseBody
     fun listBySubject(@ApiParam("查询对象") @RequestBody detailQuery: PageQuery<DetailQuery>): PageResult<DetailVo> {
         return detailService.query(detailQuery)
-    }
-
-    @ApiOperation("分页列出明细")
-    @GetMapping
-    fun list(pageable: Pageable): Page<DetailVo> {
-        return detailRepo.listVo(pageable = pageable)
     }
 
     @ApiOperation("删除单个明细")
@@ -54,11 +46,11 @@ class DetailController(
         detail.createdAt = detail.createdAt.plusSeconds(1)
         detailRepo.save(detail)
         return DetailVo.fromPo(
-                detail,
-                username = user.nickname,
-                sourceAccountName = accountNameMap[detail.sourceAccountId].orEmpty(),
-                destAccountName = accountNameMap[detail.destAccountId].orEmpty(),
-                subjectName = subject.name
+            detail,
+            username = user.nickname,
+            sourceAccountName = accountNameMap[detail.sourceAccountId].orEmpty(),
+            destAccountName = accountNameMap[detail.destAccountId].orEmpty(),
+            subjectName = subject.name
         )
     }
 
@@ -72,11 +64,11 @@ class DetailController(
             detail.createdAt = detail.createdAt.plusSeconds(1)
             detailRepo.save(detail)
             DetailVo.fromPo(
-                    detail,
-                    username = user.nickname,
-                    sourceAccountName = accountNameMap[detail.sourceAccountId].orEmpty(),
-                    destAccountName = accountNameMap[detail.destAccountId].orEmpty(),
-                    subjectName = subject.name
+                detail,
+                username = user.nickname,
+                sourceAccountName = accountNameMap[detail.sourceAccountId].orEmpty(),
+                destAccountName = accountNameMap[detail.destAccountId].orEmpty(),
+                subjectName = subject.name
             )
         }
     }
@@ -85,8 +77,8 @@ class DetailController(
         val user = userRepo.findById(detail.userId).get()
         val subject = subjectRepo.findById(detail.subjectId).get()
         val accountNameMap = accountRepo
-                .findAllById(listOf(detail.sourceAccountId, detail.destAccountId))
-                .associateBy({ a -> a.id }, { a -> a.name })
+            .findAllById(listOf(detail.sourceAccountId, detail.destAccountId))
+            .associateBy({ a -> a.id }, { a -> a.name })
         return Triple(user, subject, accountNameMap)
     }
 
@@ -94,8 +86,8 @@ class DetailController(
     @PutMapping("/{id}")
     @ResponseBody
     fun update(
-            @ApiParam("需要更新的明细的id") @PathVariable("id") id: Long,
-            @ApiParam("明细更新所传的对象") @RequestBody payload: DetailTo
+        @ApiParam("需要更新的明细的id") @PathVariable("id") id: Long,
+        @ApiParam("明细更新所传的对象") @RequestBody payload: DetailTo
     ): ResponseEntity<DetailVo> {
         val detailInDbOpt = detailRepo.findById(id)
         if (detailInDbOpt.isPresent) {
@@ -103,7 +95,7 @@ class DetailController(
             val user = userRepo.findById(payload.userId).get()
             val subject = subjectRepo.findById(payload.subjectId).get()
             val accountNameMap = accountRepo.findAllById(
-                    listOf(payload.sourceAccountId, payload.destAccountId)
+                listOf(payload.sourceAccountId, payload.destAccountId)
             ).associateBy({ a -> a.id }, { a -> a.name })
             BeanUtils.copyProperties(payload, detailInDb)
             payload.createdAt.let {
@@ -111,13 +103,15 @@ class DetailController(
             }
             detailInDb.updatedAt = LocalDateTime.now()
             detailRepo.save(detailInDb)
-            return ResponseEntity.ok(DetailVo.fromPo(
+            return ResponseEntity.ok(
+                DetailVo.fromPo(
                     detailInDb,
                     username = user.nickname,
                     sourceAccountName = accountNameMap[payload.sourceAccountId].orEmpty(),
                     destAccountName = accountNameMap[payload.destAccountId].orEmpty(),
                     subjectName = subject.name
-            ))
+                )
+            )
         } else {
             return ResponseEntity.notFound().build()
         }

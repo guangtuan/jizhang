@@ -1,12 +1,15 @@
 package tech.igrant.jizhang.detail
 
 import org.springframework.stereotype.Service
+import tech.igrant.jizhang.account.Account
 import tech.igrant.jizhang.account.AccountService
 import tech.igrant.jizhang.ext.toJSON
 import tech.igrant.jizhang.ext.toLocalDateTime
 import tech.igrant.jizhang.framework.PageQuery
 import tech.igrant.jizhang.framework.PageResult
+import tech.igrant.jizhang.subject.Subject
 import tech.igrant.jizhang.subject.SubjectService
+import tech.igrant.jizhang.user.User
 import tech.igrant.jizhang.user.UserService
 import java.time.LocalDateTime
 import java.util.logging.Logger
@@ -17,17 +20,18 @@ import javax.persistence.criteria.Root
 
 @Service
 class DetailService(
-        private val entityManager: EntityManager,
-        private val accountService: AccountService,
-        private val subjectService: SubjectService,
-        private val userService: UserService,
-        private val detailRepo: DetailRepo
+    private val entityManager: EntityManager,
+    private val accountService: AccountService,
+    private val subjectService: SubjectService,
+    private val userService: UserService,
+    private val detailRepo: DetailRepo
 ) {
 
     val logger: Logger = Logger.getLogger(DetailService::class.simpleName)
 
     fun query(detailQuery: PageQuery<DetailQuery>): PageResult<DetailVo> {
         logger.info { "params: ${detailQuery.toJSON()}" }
+        val startTime = System.nanoTime()
         val criteriaBuilder = entityManager.criteriaBuilder
         val rowsQuery = criteriaBuilder.createQuery(Detail::class.java)
         val countQuery = criteriaBuilder.createQuery(Long::class.java)
@@ -48,15 +52,26 @@ class DetailService(
         }
         val resultList = createQuery.resultList
         val total = entityManager.createQuery(countSql).singleResult
-        return PageResult(
-                content = resultList.map(this::toVo).toList(),
-                total = total,
-                page = detailQuery.page,
-                size = detailQuery.size
+        val subjectMap = subjectService.subjectMap()
+        val accountMap = accountService.lookup()
+        val userMap = userService.userMap()
+        val pageResult = PageResult(
+            content = resultList.map { this.toVo(it, subjectMap, accountMap, userMap) }.toList(),
+            total = total,
+            page = detailQuery.page,
+            size = detailQuery.size
         )
+        val endTime = System.nanoTime()
+        val duration = (endTime - startTime) / 1000000
+        logger.info("execute:$duration {}ms")
+        return pageResult
     }
 
-    private fun conditions(builder: CriteriaBuilder, detailQuery: PageQuery<DetailQuery>, data: Root<Detail>): Predicate {
+    private fun conditions(
+        builder: CriteriaBuilder,
+        detailQuery: PageQuery<DetailQuery>,
+        data: Root<Detail>
+    ): Predicate {
         val conditions = mutableListOf<Predicate>()
         detailQuery.queryParam.subjectIds?.let {
             if (it.isNotEmpty()) {
@@ -79,33 +94,40 @@ class DetailService(
         detailQuery.queryParam.start?.let {
             detailQuery.queryParam.end?.let {
                 val createdAtRow = data.get<LocalDateTime>("createdAt")
-                conditions.add(builder.between(
+                conditions.add(
+                    builder.between(
                         createdAtRow,
                         detailQuery.queryParam.start.toLocalDateTime(),
                         detailQuery.queryParam.end.toLocalDateTime()
-                ))
+                    )
+                )
             }
         }
         return conditions.reduce { acc, curr -> builder.and(acc, curr) }
     }
 
-    fun toVo(detail: Detail): DetailVo {
+    fun toVo(
+        detail: Detail,
+        subjectMap: Map<Long, Subject>,
+        accountMap: Map<Long, Account>,
+        userMap: Map<Long, User>
+    ): DetailVo {
         val vo = DetailVo.fromPo(detail, "", "", "", "")
         detail.sourceAccountId?.let {
-            vo.sourceAccountName = accountService.findById(it)?.name
+            vo.sourceAccountName = accountMap[it]?.name
         }
         detail.destAccountId?.let {
-            vo.destAccountName = accountService.findById(it)?.name
+            vo.destAccountName = accountMap[it]?.name
         }
-        vo.subjectName = subjectService.findById(vo.subjectId)?.name
-        vo.username = userService.findById(detail.userId)?.nickname
+        vo.subjectName = subjectMap[vo.subjectId]?.name
+        vo.username = userMap[detail.userId]?.nickname
         return vo
     }
 
     fun getByAccountId(id: Long): List<Detail> {
         return listOf(
-                detailRepo.findByDestAccountId(id),
-                detailRepo.findBySourceAccountId(id)
+            detailRepo.findByDestAccountId(id),
+            detailRepo.findBySourceAccountId(id)
         ).flatten()
     }
 
