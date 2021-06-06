@@ -2,7 +2,9 @@ package tech.igrant.jizhang.event
 
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Component
-import java.sql.Date
+import tech.igrant.jizhang.ext.FMT_YYYY_MM_dd_HH_mm_ss_SSS
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Component
 interface EventService {
@@ -33,7 +35,7 @@ interface EventService {
             jdbcTemplate.update(sql) {
                 it.setLong(1, eventDetailLinkRequest.eventId)
                 it.setLong(2, eventDetailLinkRequest.detailId)
-                it.setDate(3, Date(java.util.Date().time))
+                it.setString(3, LocalDateTime.now().format(DateTimeFormatter.ofPattern(FMT_YYYY_MM_dd_HH_mm_ss_SSS)))
             }
         }
 

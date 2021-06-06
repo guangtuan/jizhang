@@ -36,3 +36,4 @@ fun Date.toLocalDateTime(): LocalDateTime {
 }
 
 const val FMT_YYYY_MM_dd_HH_mm_ss = "YYYY-MM-dd HH:mm:ss"
+const val FMT_YYYY_MM_dd_HH_mm_ss_SSS = "YYYY-MM-dd HH:mm:ss.SSS"
