@@ -50,7 +50,8 @@ class DetailController(
             username = user.nickname,
             sourceAccountName = accountNameMap[detail.sourceAccountId].orEmpty(),
             destAccountName = accountNameMap[detail.destAccountId].orEmpty(),
-            subjectName = subject.name
+            subjectName = subject.name,
+            event = null
         )
     }
 
@@ -68,7 +69,8 @@ class DetailController(
                 username = user.nickname,
                 sourceAccountName = accountNameMap[detail.sourceAccountId].orEmpty(),
                 destAccountName = accountNameMap[detail.destAccountId].orEmpty(),
-                subjectName = subject.name
+                subjectName = subject.name,
+                event = null
             )
         }
     }
@@ -109,7 +111,8 @@ class DetailController(
                     username = user.nickname,
                     sourceAccountName = accountNameMap[payload.sourceAccountId].orEmpty(),
                     destAccountName = accountNameMap[payload.destAccountId].orEmpty(),
-                    subjectName = subject.name
+                    subjectName = subject.name,
+                    event = null
                 )
             )
         } else {

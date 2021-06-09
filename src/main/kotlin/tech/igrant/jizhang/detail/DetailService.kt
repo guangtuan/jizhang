@@ -3,6 +3,7 @@ package tech.igrant.jizhang.detail
 import org.springframework.stereotype.Service
 import tech.igrant.jizhang.account.Account
 import tech.igrant.jizhang.account.AccountService
+import tech.igrant.jizhang.event.EventService
 import tech.igrant.jizhang.ext.toJSON
 import tech.igrant.jizhang.ext.toLocalDateTime
 import tech.igrant.jizhang.framework.PageQuery
@@ -24,7 +25,8 @@ class DetailService(
     private val accountService: AccountService,
     private val subjectService: SubjectService,
     private val userService: UserService,
-    private val detailRepo: DetailRepo
+    private val detailRepo: DetailRepo,
+    private val eventService: EventService
 ) {
 
     val logger: Logger = Logger.getLogger(DetailService::class.simpleName)
@@ -55,8 +57,17 @@ class DetailService(
         val subjectMap = subjectService.subjectMap()
         val accountMap = accountService.lookup()
         val userMap = userService.userMap()
+        val content = resultList.map { this.toVo(it, subjectMap, accountMap, userMap) }.toList()
+        val eventMap = eventService.eventMap(content.map { detailVo -> detailVo.id })
+        logger.info("eventMap: ${eventMap.toJSON()}")
+        for (detailVo in content) {
+            eventMap[detailVo.id]?.let {
+                detailVo.eventId = it.id
+                detailVo.eventName = it.name
+            }
+        }
         val pageResult = PageResult(
-            content = resultList.map { this.toVo(it, subjectMap, accountMap, userMap) }.toList(),
+            content = content,
             total = total,
             page = detailQuery.page,
             size = detailQuery.size
@@ -112,7 +123,7 @@ class DetailService(
         accountMap: Map<Long, Account>,
         userMap: Map<Long, User>
     ): DetailVo {
-        val vo = DetailVo.fromPo(detail, "", "", "", "")
+        val vo = DetailVo.fromPo(detail, "", "", "", "", null)
         detail.sourceAccountId?.let {
             vo.sourceAccountName = accountMap[it]?.name
         }

@@ -2,6 +2,7 @@ package tech.igrant.jizhang.detail
 
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
+import tech.igrant.jizhang.event.Event
 import tech.igrant.jizhang.ext.toLocalDateTime
 import java.time.LocalDateTime
 import java.util.*
@@ -63,6 +64,8 @@ data class DetailVo(
         @ApiModelProperty("科目id")
         val subjectId: Long,
         var subjectName: String?,
+        var eventName: String?,
+        var eventId: Long?,
         var remark: String?,
         var createdAt: LocalDateTime?,
         var updatedAt: LocalDateTime?,
@@ -74,7 +77,8 @@ data class DetailVo(
                 username: String,
                 sourceAccountName: String,
                 destAccountName: String,
-                subjectName: String
+                subjectName: String,
+                event: Event?
         ): DetailVo {
             return DetailVo(
                     id = po.id!!,
@@ -89,7 +93,9 @@ data class DetailVo(
                     subjectId = po.subjectId,
                     destAccountId = po.destAccountId,
                     sourceAccountId = po.sourceAccountId,
-                    userId = po.userId
+                    userId = po.userId,
+                    eventName = event?.name,
+                    eventId = event?.id
             )
         }
     }

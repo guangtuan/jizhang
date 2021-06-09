@@ -15,8 +15,14 @@ interface EventService {
 
     fun link(eventDetailLinkRequest: EventDetailLinkRequest)
 
+    fun eventMap(detailIds: List<Long>): Map<Long, Event>
+
     @Component
-    class Impl(private val eventRepo: EventRepo, private val jdbcTemplate: JdbcTemplate) : EventService {
+    class Impl(
+        private val eventDetailRepo: EventDetailRepo,
+        private val eventRepo: EventRepo,
+        private val jdbcTemplate: JdbcTemplate
+    ) : EventService {
 
         override fun list(): List<Event> {
             return eventRepo.findAll().filterNotNull()
@@ -37,6 +43,30 @@ interface EventService {
                 it.setLong(2, eventDetailLinkRequest.detailId)
                 it.setString(3, LocalDateTime.now().format(DateTimeFormatter.ofPattern(FMT_YYYY_MM_dd_HH_mm_ss_SSS)))
             }
+        }
+
+        override fun eventMap(detailIds: List<Long>): Map<Long, Event> {
+            val ret = eventDetailRepo.findAllByDetailIds(detailIds)
+                .fold(
+                    mutableMapOf<Long, Long>(),
+                    { acc, eventDetail ->
+                        acc[eventDetail.eventId] = eventDetail.detailId
+                        acc
+                    }
+                )
+            return eventRepo
+                .findAllById(ret.keys)
+                .fold(
+                    mutableMapOf(),
+                    { acc, e ->
+                        e.id?.let { eventId ->
+                            ret[eventId]?.let { detailId ->
+                                acc[detailId] = e
+                            }
+                        }
+                        acc
+                    }
+                )
         }
 
     }
