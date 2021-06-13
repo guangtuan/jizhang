@@ -46,24 +46,37 @@ interface EventService {
         }
 
         override fun eventMap(detailIds: List<Long>): Map<Long, Event> {
-            val ret = eventDetailRepo.findAllByDetailIds(detailIds)
+            val detailToEvent = eventDetailRepo.findAllByDetailIds(detailIds)
                 .fold(
                     mutableMapOf<Long, Long>(),
                     { acc, eventDetail ->
-                        acc[eventDetail.eventId] = eventDetail.detailId
+                        acc[eventDetail.detailId] = eventDetail.eventId
                         acc
                     }
                 )
-            return eventRepo
-                .findAllById(ret.keys)
+            val lookup = eventRepo
+                .findAllById(detailToEvent.values)
+                .fold(
+                    mutableMapOf<Long, Event>(),
+                    { acc, e ->
+                        e.id?.let {
+                            acc[it] = e
+                        }
+                        acc
+                    }
+                )
+            return detailIds
+                .mapNotNull { detailId ->
+                    detailToEvent[detailId]?.let { eventId ->
+                        lookup[eventId]?.let { event ->
+                            Pair(detailId, event)
+                        }
+                    }
+                }
                 .fold(
                     mutableMapOf(),
                     { acc, e ->
-                        e.id?.let { eventId ->
-                            ret[eventId]?.let { detailId ->
-                                acc[detailId] = e
-                            }
-                        }
+                        acc[e.first] = e.second
                         acc
                     }
                 )
