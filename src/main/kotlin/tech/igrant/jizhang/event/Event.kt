@@ -16,6 +16,13 @@ data class Event(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long? = null
 )
 
+data class EventVo(
+    val name: String,
+    val countOfDetail: Int,
+    var createdAt: LocalDateTime,
+    val sumAmount: Int
+)
+
 data class EventTo(val name: String) {
     fun toPo(): Event {
         return Event(
@@ -41,5 +48,8 @@ interface EventDetailRepo : JpaRepository<EventDetail, Long> {
 
     @Query(nativeQuery = true, value = "select * from event_detail where detail_id in :detailIds")
     fun findAllByDetailIds(@Param("detailIds") detailIds: List<Long>): List<EventDetail>
+
+    @Query(nativeQuery = true, value = "select * from event_detail where event_id in :eventIds")
+    fun findAllByEventIds(@Param("eventIds") eventIds: List<Long>): List<EventDetail>
 
 }

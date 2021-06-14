@@ -2,6 +2,7 @@ package tech.igrant.jizhang.event
 
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Component
+import tech.igrant.jizhang.detail.DetailRepo
 import tech.igrant.jizhang.ext.FMT_YYYY_MM_dd_HH_mm_ss_SSS
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -9,7 +10,7 @@ import java.time.format.DateTimeFormatter
 @Component
 interface EventService {
 
-    fun list(): List<Event>
+    fun list(): List<EventVo>
 
     fun create(eventTo: EventTo): Event
 
@@ -21,11 +22,39 @@ interface EventService {
     class Impl(
         private val eventDetailRepo: EventDetailRepo,
         private val eventRepo: EventRepo,
+        private val detailRepo: DetailRepo,
         private val jdbcTemplate: JdbcTemplate
     ) : EventService {
 
-        override fun list(): List<Event> {
-            return eventRepo.findAll().filterNotNull()
+        override fun list(): List<EventVo> {
+            val events = eventRepo.findAll()
+            if (events.isEmpty()) {
+                return emptyList()
+            }
+            val groupedByEventId = eventDetailRepo
+                .findAllByEventIds(events.mapNotNull { it.id })
+                .groupBy { it.eventId }
+            val idToAmount = detailRepo.findAllById(groupedByEventId.values.flatten().map { it.detailId }).fold(
+                mutableMapOf<Long, Int>(),
+                { acc, curr ->
+                    curr.id?.let {
+                        acc[it] = curr.amount
+                    }
+                    acc
+                }
+            )
+            return events.map { event ->
+                EventVo(
+                    name = event.name,
+                    createdAt = event.createdAt,
+                    sumAmount = groupedByEventId
+                        .getOrDefault(event.id, emptyList())
+                        .map { it.detailId }
+                        .mapNotNull { idToAmount[it] }
+                        .sum(),
+                    countOfDetail = groupedByEventId.getOrDefault(event.id, emptyList()).size
+                )
+            }
         }
 
         override fun create(eventTo: EventTo): Event {

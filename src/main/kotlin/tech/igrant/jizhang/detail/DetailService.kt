@@ -146,4 +146,16 @@ class DetailService(
         return detailRepo.findBySubjectId(subjectId);
     }
 
+    fun idToAmount(detailIds: List<Long>): Map<Long, Int> {
+        return detailRepo.findAllById(detailIds).fold(
+            mutableMapOf(),
+            { acc, curr ->
+                curr.id?.let {
+                    acc[it] = curr.amount
+                }
+                acc
+            }
+        )
+    }
+
 }

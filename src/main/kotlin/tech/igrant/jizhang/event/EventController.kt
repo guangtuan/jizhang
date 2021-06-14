@@ -9,7 +9,7 @@ import java.util.*
 class EventController(private val eventService: EventService) {
 
     @GetMapping
-    fun list(): ResponseEntity<List<Event>> {
+    fun list(): ResponseEntity<List<EventVo>> {
         return ResponseEntity.of(Optional.ofNullable(eventService.list()))
     }
 
