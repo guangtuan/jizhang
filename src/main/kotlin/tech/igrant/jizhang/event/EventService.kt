@@ -46,6 +46,9 @@ interface EventService {
         }
 
         override fun eventMap(detailIds: List<Long>): Map<Long, Event> {
+            if (detailIds.isEmpty()) {
+                return emptyMap()
+            }
             val detailToEvent = eventDetailRepo.findAllByDetailIds(detailIds)
                 .fold(
                     mutableMapOf<Long, Long>(),
