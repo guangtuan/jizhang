@@ -21,11 +21,10 @@ class PropertyConfig {
 
         @Bean
         fun redisConnectionFactory(): LettuceConnectionFactory {
-            val redisHost = System.getenv("JIZHANG_CACHE_HOST")
-            val redisPort = System.getenv("JIZHANG_CACHE_PORT").toInt()
+            val (host, port) = System.getenv("JIZHANG_CACHE_HOST").split(":")
             val redisPass = System.getenv("JIZHANG_CACHE_PASS")
             val redisDb = System.getenv("JIZHANG_CACHE_DB")?.toInt()
-            val redisStandaloneConfiguration = RedisStandaloneConfiguration(redisHost, redisPort)
+            val redisStandaloneConfiguration = RedisStandaloneConfiguration(host, port.toInt())
             redisStandaloneConfiguration.password = RedisPassword.of(redisPass)
             redisStandaloneConfiguration.database = redisDb ?: 0
             return LettuceConnectionFactory(redisStandaloneConfiguration)
@@ -39,12 +38,12 @@ class PropertyConfig {
             val dbUser = System.getenv("JIZHANG_DB_USER")
             val dbPassword = System.getenv("JIZHANG_DB_PASSWORD")
             return DataSourceBuilder
-                    .create()
-                    .username(dbUser)
-                    .password(dbPassword)
-                    .url(dataSourceUrl(dbHost, dbName))
-                    .driverClassName("com.mysql.jdbc.Driver")
-                    .build()
+                .create()
+                .username(dbUser)
+                .password(dbPassword)
+                .url(dataSourceUrl(dbHost, dbName))
+                .driverClassName("com.mysql.jdbc.Driver")
+                .build()
         }
 
         private fun dataSourceUrl(dbHost: String, dbName: String): String {
