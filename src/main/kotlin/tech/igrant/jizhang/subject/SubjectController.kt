@@ -1,10 +1,14 @@
 package tech.igrant.jizhang.subject
 
 import io.swagger.annotations.ApiOperation
+import org.apache.commons.lang3.time.DateUtils
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import tech.igrant.jizhang.detail.Detail
 import tech.igrant.jizhang.detail.DetailService
+import tech.igrant.jizhang.ext.fmt
+import tech.igrant.jizhang.ext.toDate
 import java.time.LocalDateTime
 import java.util.*
 
@@ -12,9 +16,41 @@ import java.util.*
 @RequestMapping("/api/subjects")
 @ApiOperation("科目接口")
 class SubjectController(
-        private val subjectRepo: SubjectRepo,
-        private val detailService: DetailService
+    private val subjectRepo: SubjectRepo,
+    private val detailService: DetailService
 ) {
+
+    @ApiOperation("统计科目的曲线")
+    @GetMapping("/{id}/stat")
+    fun stat(
+        @PathVariable("id") id: Long,
+        @RequestParam("start") start: Long,
+        @RequestParam("end") end: Long,
+        @RequestParam("level") level: Int
+    ): ResponseEntity<List<SubjectCost>> {
+        val details = getDetails(id, level, Date(start), Date(end))
+        val groupBy = details.groupBy { d -> getYearMonth(d) }
+        val list = groupBy.entries.map { e ->
+            SubjectCost(
+                subjectName = subjectRepo.findById(id).get().name,
+                unit = StatUnit.Month,
+                display = e.key,
+                cost = e.value.map { v -> v.amount.toLong() / 100 }.reduce { acc, i -> acc + i })
+        }.sortedBy { subjectCost -> DateUtils.parseDate(subjectCost.display, "yyyy-MM") }
+        return ResponseEntity.of(Optional.of(list))
+    }
+
+    private fun getDetails(id: Long, level: Int, start: Date, end: Date): List<Detail> {
+        if (level == Subject.LEVEL_SMALL) {
+            return detailService.getBySubjectAndTime(listOf(id), start, end)
+        }
+        val childrenIds = subjectRepo.findChildrenByParent(id).mapNotNull { sub -> sub.id }
+        return detailService.getBySubjectAndTime(childrenIds, start, end)
+    }
+
+    private fun getYearMonth(d: Detail): String {
+        return d.createdAt.toDate().fmt("yyyy-MM")
+    }
 
     @ApiOperation("列出科目")
     @GetMapping()

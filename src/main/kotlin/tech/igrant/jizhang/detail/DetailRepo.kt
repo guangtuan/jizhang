@@ -16,4 +16,14 @@ interface DetailRepo : JpaRepository<Detail, Long>,
     @Query(value = "select * from detail where created_at between :start and :end", nativeQuery = true)
     fun findByStartAndEnd(@Param("start") start: Date, @Param("end") end: Date): List<Detail>
 
+    @Query(
+        value = "select * from detail where subject_id in :ids and created_at between :start and :end",
+        nativeQuery = true
+    )
+    fun findBySubjectIdAndTime(
+        @Param("ids") id: List<Long>,
+        @Param("start") start: Date,
+        @Param("end") end: Date
+    ): List<Detail>
+
 }

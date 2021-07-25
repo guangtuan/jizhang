@@ -13,6 +13,7 @@ import tech.igrant.jizhang.subject.SubjectService
 import tech.igrant.jizhang.user.User
 import tech.igrant.jizhang.user.UserService
 import java.time.LocalDateTime
+import java.util.*
 import java.util.logging.Logger
 import javax.persistence.EntityManager
 import javax.persistence.criteria.CriteriaBuilder
@@ -156,6 +157,10 @@ class DetailService(
                 acc
             }
         )
+    }
+
+    fun getBySubjectAndTime(ids: List<Long>, start: Date, end: Date): List<Detail> {
+        return detailRepo.findBySubjectIdAndTime(ids, start, end);
     }
 
 }
