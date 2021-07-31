@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import tech.igrant.jizhang.detail.Detail
 import tech.igrant.jizhang.detail.DetailService
+import tech.igrant.jizhang.detail.it.BY
+import tech.igrant.jizhang.detail.it.ItDetailQuery
 import tech.igrant.jizhang.ext.fmt
 import tech.igrant.jizhang.ext.toDate
 import java.time.LocalDateTime
@@ -17,35 +19,42 @@ import java.util.*
 @ApiOperation("科目接口")
 class SubjectController(
     private val subjectRepo: SubjectRepo,
-    private val detailService: DetailService
+    private val detailService: DetailService,
+    private val subjectService: SubjectService
 ) {
 
     @ApiOperation("统计科目的曲线")
-    @GetMapping("/{id}/stat")
+    @PostMapping("/stat")
     fun stat(
-        @PathVariable("id") id: Long,
-        @RequestParam("start") start: Long,
-        @RequestParam("end") end: Long,
-        @RequestParam("level") level: Int
+        @RequestBody subjectStatQueryRequest: SubjectStatQueryRequest
     ): ResponseEntity<List<SubjectCost>> {
-        val details = getDetails(id, level, Date(start), Date(end))
-        val groupBy = details.groupBy { d -> getYearMonth(d) }
-        val list = groupBy.entries.map { e ->
-            SubjectCost(
-                subjectName = subjectRepo.findById(id).get().name,
-                unit = StatUnit.Month,
-                display = e.key,
-                cost = e.value.map { v -> v.amount.toLong() / 100 }.reduce { acc, i -> acc + i })
-        }.sortedBy { subjectCost -> DateUtils.parseDate(subjectCost.display, "yyyy-MM") }
-        return ResponseEntity.of(Optional.of(list))
+        val details = getDetails(
+            subjectStatQueryRequest.ids,
+            subjectStatQueryRequest.level,
+            subjectStatQueryRequest.start,
+            subjectStatQueryRequest.end
+        )
+        val map = details
+            .groupBy { d -> d.subjectId }
+            .map { (key, value) ->
+                value.groupBy { d -> getYearMonth(d) }.entries.map { e ->
+                    SubjectCost(
+                        subjectName = subjectRepo.findById(key).get().name,
+                        unit = StatUnit.Month,
+                        display = e.key,
+                        cost = e.value.map { v -> v.amount.toLong() / 100 }.reduce { acc, i -> acc + i })
+                }.sortedBy { subjectCost -> DateUtils.parseDate(subjectCost.display, "yyyy-MM") }
+            }
+            .flatten()
+        return ResponseEntity.of(Optional.of(map))
     }
 
-    private fun getDetails(id: Long, level: Int, start: Date, end: Date): List<Detail> {
+    private fun getDetails(ids: List<Long>, level: Int, start: Long, end: Long): List<Detail> {
         if (level == Subject.LEVEL_SMALL) {
-            return detailService.getBySubjectAndTime(listOf(id), start, end)
+            return detailService.itQuery(ItDetailQuery(BY.SUBJECT, ids, start, end))
         }
-        val childrenIds = subjectRepo.findChildrenByParent(id).mapNotNull { sub -> sub.id }
-        return detailService.getBySubjectAndTime(childrenIds, start, end)
+        val childrenIds = subjectService.flat(ids).mapNotNull { sub -> sub.id }
+        return detailService.itQuery(ItDetailQuery(BY.SUBJECT, childrenIds, start, end))
     }
 
     private fun getYearMonth(d: Detail): String {
@@ -58,7 +67,18 @@ class SubjectController(
         val others = -1L
         val parents = subjectRepo.findParent().map { po -> po.toVo(null) }.toMutableList()
         val childrenGroupedByParent = subjectRepo.findChildren().groupBy { po -> po.parentId ?: others }
-        parents.add(SubjectVo(id = others, name = "其他", description = "其他", children = mutableListOf(), parentId = null, parent = null, level = 1, createdAt = LocalDateTime.now()))
+        parents.add(
+            SubjectVo(
+                id = others,
+                name = "其他",
+                description = "其他",
+                children = mutableListOf(),
+                parentId = null,
+                parent = null,
+                level = 1,
+                createdAt = LocalDateTime.now()
+            )
+        )
         for (parent in parents) {
             childrenGroupedByParent[parent.id]?.let {
                 parent.children.addAll(it.map { child -> child.toVo(parent.name) })
@@ -69,11 +89,16 @@ class SubjectController(
 
     @ApiOperation("根据等级拿到科目")
     @GetMapping(params = ["by=level"])
-    fun listByLevel(@RequestParam("level", required = true) level: Int, @RequestParam("parentId", required = false) parentId: Long?): ResponseEntity<List<SubjectVo>> {
+    fun listByLevel(
+        @RequestParam("level", required = true) level: Int,
+        @RequestParam("parentId", required = false) parentId: Long?
+    ): ResponseEntity<List<SubjectVo>> {
         return when (level) {
             1 -> ResponseEntity.ok(subjectRepo.findParent().map { po -> po.toVo(null) }.toList())
-            2 -> parentId?.let { ResponseEntity.ok(subjectRepo.findChildrenByParent(it).map { po -> po.toVo(null) }.toList()) }
-                    ?: ResponseEntity.ok(subjectRepo.findChildren().map { po -> po.toVo(null) }.toList())
+            2 -> parentId?.let {
+                ResponseEntity.ok(subjectRepo.findChildrenByParent(it).map { po -> po.toVo(null) }.toList())
+            }
+                ?: ResponseEntity.ok(subjectRepo.findChildren().map { po -> po.toVo(null) }.toList())
             else -> ResponseEntity.badRequest().build()
         }
     }
@@ -88,8 +113,8 @@ class SubjectController(
     @PutMapping("{id}")
     fun update(@PathVariable("id") id: Long, @RequestBody subjectTo: SubjectTo): ResponseEntity<SubjectVo?> {
         return subjectRepo.findById(id)
-                .map { ResponseEntity.ok(subjectRepo.save(subjectTo.toPo(it)).toVo(null)) }
-                .orElse(ResponseEntity.notFound().build())
+            .map { ResponseEntity.ok(subjectRepo.save(subjectTo.toPo(it)).toVo(null)) }
+            .orElse(ResponseEntity.notFound().build())
     }
 
     @ApiOperation("删除一个科目")

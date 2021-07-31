@@ -12,7 +12,16 @@ interface SubjectRepo : CrudRepository<Subject, Long> {
     @Query(nativeQuery = true, value = "select * from subject where level = 2 order by created_at desc")
     fun findChildren(): List<Subject>
 
-    @Query(nativeQuery = true, value = "select * from subject where level = 2 and parent_id = :parentId order by created_at desc")
+    @Query(
+        nativeQuery = true,
+        value = "select * from subject where level = 2 and parent_id = :parentId order by created_at desc"
+    )
     fun findChildrenByParent(@Param("parentId") parentId: Long): List<Subject>
+
+    @Query(
+        nativeQuery = true,
+        value = "select * from subject where level = 2 and parent_id in :parentIds order by created_at desc"
+    )
+    fun findChildrenByParents(@Param("parentIds") parentIds: List<Long>): List<Subject>
 
 }

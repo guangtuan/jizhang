@@ -3,6 +3,8 @@ package tech.igrant.jizhang.detail
 import org.springframework.stereotype.Service
 import tech.igrant.jizhang.account.Account
 import tech.igrant.jizhang.account.AccountService
+import tech.igrant.jizhang.detail.it.BY
+import tech.igrant.jizhang.detail.it.ItDetailQuery
 import tech.igrant.jizhang.event.EventService
 import tech.igrant.jizhang.ext.toJSON
 import tech.igrant.jizhang.ext.toLocalDateTime
@@ -147,20 +149,12 @@ class DetailService(
         return detailRepo.findBySubjectId(subjectId);
     }
 
-    fun idToAmount(detailIds: List<Long>): Map<Long, Int> {
-        return detailRepo.findAllById(detailIds).fold(
-            mutableMapOf(),
-            { acc, curr ->
-                curr.id?.let {
-                    acc[it] = curr.amount
-                }
-                acc
-            }
-        )
-    }
+    fun itQuery(q: ItDetailQuery): List<Detail> {
+        if (q.by == BY.SUBJECT) {
+            return detailRepo.findBySubjectIdAndTime(q.ids, Date(q.start), Date(q.end))
+        }
 
-    fun getBySubjectAndTime(ids: List<Long>, start: Date, end: Date): List<Detail> {
-        return detailRepo.findBySubjectIdAndTime(ids, start, end);
+        return emptyList()
     }
 
 }
