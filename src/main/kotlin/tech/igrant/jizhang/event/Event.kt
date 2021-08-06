@@ -17,6 +17,7 @@ data class Event(
 )
 
 data class EventVo(
+    var id: Long,
     val name: String,
     val countOfDetail: Int,
     var createdAt: LocalDateTime,

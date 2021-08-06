@@ -77,7 +77,7 @@ class DetailService(
         )
         val endTime = System.nanoTime()
         val duration = (endTime - startTime) / 1000000
-        logger.info("execute:$duration {}ms")
+        logger.info("execute: $duration ms")
         return pageResult
     }
 

@@ -43,17 +43,20 @@ interface EventService {
                     acc
                 }
             )
-            return events.map { event ->
-                EventVo(
-                    name = event.name,
-                    createdAt = event.createdAt,
-                    sumAmount = groupedByEventId
-                        .getOrDefault(event.id, emptyList())
-                        .map { it.detailId }
-                        .mapNotNull { idToAmount[it] }
-                        .sum(),
-                    countOfDetail = groupedByEventId.getOrDefault(event.id, emptyList()).size
-                )
+            return events.mapNotNull { event ->
+                event.id?.let { eventId ->
+                    EventVo(
+                        id = eventId,
+                        name = event.name,
+                        createdAt = event.createdAt,
+                        sumAmount = groupedByEventId
+                            .getOrDefault(eventId, emptyList())
+                            .map { it.detailId }
+                            .mapNotNull { idToAmount[it] }
+                            .sum(),
+                        countOfDetail = groupedByEventId.getOrDefault(eventId, emptyList()).size
+                    )
+                }
             }
         }
 
