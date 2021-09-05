@@ -13,6 +13,7 @@ data class Account(
         var createdAt: Date,
         var updatedAt: Date,
         var initAmount: Int,
+        var tail: String?,
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long? = null
 )
 
@@ -21,6 +22,7 @@ data class AccountTo(
         var type: String,
         var name: String,
         var description: String,
+        var tail: String?,
         var initAmount: Int
 ) {
 
@@ -29,6 +31,7 @@ data class AccountTo(
                 type = this.type,
                 userId = this.userId,
                 name = this.name,
+                tail = this.tail,
                 description = this.description,
                 createdAt = Date(),
                 updatedAt = Date(),
@@ -47,6 +50,7 @@ data class AccountVo(
         var updatedAt: Date,
         var description: String,
         var nickname: String,
+        var tail: String?,
         var initAmount: Int
 ) {
     companion object {
@@ -57,6 +61,7 @@ data class AccountVo(
                     type = account.type,
                     name = account.name,
                     description = account.description,
+                    tail = account.tail,
                     nickname = nickname,
                     createdAt = account.createdAt,
                     updatedAt = account.updatedAt,

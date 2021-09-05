@@ -55,6 +55,7 @@ class AccountController(
                     it.type = accountTo.type
                     it.name = accountTo.name
                     it.description = accountTo.description
+                    it.tail = accountTo.tail
                     it.updatedAt = Date()
                     ResponseEntity.ok(AccountVo.fromAccount(
                             accountRepo.save(it),
