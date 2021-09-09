@@ -13,16 +13,16 @@ import java.util.*
 @RestController
 @RequestMapping("/api/accounts")
 class AccountController(
-        private val detailService: DetailService,
-        private val userService: UserService,
-        private val accountRepo: AccountRepo,
-        private val userRepo: UserRepo
+    private val detailService: DetailService,
+    private val userService: UserService,
+    private val accountRepo: AccountRepo,
+    private val userRepo: UserRepo
 ) {
 
     val logger: Logger = LoggerFactory.getLogger(AccountController::class.java)
 
     @ApiOperation("列出所有账户")
-    @GetMapping()
+    @GetMapping
     fun list(): List<AccountVo> {
         val accounts = accountRepo.findAll()
         val userIds = accounts.map { account -> account.userId }.toSet().toList()
@@ -34,13 +34,21 @@ class AccountController(
         }
     }
 
+    @ApiOperation("根据用户列出账户")
+    @GetMapping(params = ["by=user"])
+    fun listByUser(userId: Long): List<AccountVo> {
+        val nickname = userService.userMap(listOf(userId))[userId]?.nickname ?: ""
+        return accountRepo.findByUserId(userId)
+            .map { account -> AccountVo.fromAccount(account, nickname) }
+    }
+
     @ApiOperation("新建一个账户")
     @PostMapping()
     fun create(@RequestBody accountTo: AccountTo): AccountVo {
         val userObject = userRepo.findById(accountTo.userId).get()
         return AccountVo.fromAccount(
-                accountRepo.save(accountTo.toAccount()),
-                userObject.nickname
+            accountRepo.save(accountTo.toAccount()),
+            userObject.nickname
         )
     }
 
@@ -48,21 +56,23 @@ class AccountController(
     @PutMapping("/{id}")
     fun update(@PathVariable id: Long, @RequestBody accountTo: AccountTo): ResponseEntity<AccountVo?> {
         return accountRepo.findById(id)
-                .map {
-                    logger.info("acc: {}", it)
-                    val userObject = userRepo.findById(accountTo.userId).get()
-                    it.userId = accountTo.userId
-                    it.type = accountTo.type
-                    it.name = accountTo.name
-                    it.description = accountTo.description
-                    it.tail = accountTo.tail
-                    it.updatedAt = Date()
-                    ResponseEntity.ok(AccountVo.fromAccount(
-                            accountRepo.save(it),
-                            userObject.nickname
-                    ))
-                }
-                .orElse(ResponseEntity.notFound().build())
+            .map {
+                logger.info("acc: {}", it)
+                val userObject = userRepo.findById(accountTo.userId).get()
+                it.userId = accountTo.userId
+                it.type = accountTo.type
+                it.name = accountTo.name
+                it.description = accountTo.description
+                it.tail = accountTo.tail
+                it.updatedAt = Date()
+                ResponseEntity.ok(
+                    AccountVo.fromAccount(
+                        accountRepo.save(it),
+                        userObject.nickname
+                    )
+                )
+            }
+            .orElse(ResponseEntity.notFound().build())
     }
 
     @ApiOperation("删除一个账户，已经有明细了则不允许删除账户")

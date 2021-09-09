@@ -24,21 +24,21 @@ interface UserService {
     ) : UserService {
 
         override fun userMap(userIds: List<Long>): Map<Long, User> {
-            return userRepo.findAllById(userIds).fold(mutableMapOf(), { acc, user ->
+            return userRepo.findAllById(userIds).fold(mutableMapOf()) { acc, user ->
                 user.id?.let {
                     acc[it] = user
                 }
                 acc
-            })
+            }
         }
 
         override fun userMap(): Map<Long, User> {
-            return userRepo.findAll().fold(mutableMapOf(), { acc, user ->
+            return userRepo.findAll().fold(mutableMapOf()) { acc, user ->
                 user.id?.let {
                     acc[it] = user
                 }
                 acc
-            })
+            }
         }
 
         override fun createUser(to: UserTo): User {

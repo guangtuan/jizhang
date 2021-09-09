@@ -11,14 +11,13 @@ class AccountService(
         return accountRepo.findAll()
             .toList()
             .fold(
-                mutableMapOf(),
-                { acc, account ->
-                    account.id?.let {
-                        acc[it] = account
-                    }
-                    acc
+                mutableMapOf()
+            ) { acc, account ->
+                account.id?.let {
+                    acc[it] = account
                 }
-            )
+                acc
+            }
     }
 
     fun findById(id: Long): Account? {
